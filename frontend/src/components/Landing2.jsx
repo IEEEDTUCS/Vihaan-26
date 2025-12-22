@@ -8,63 +8,46 @@ export default function Landing2() {
     <section className="relative min-h-screen w-full bg-black text-white overflow-hidden">
 
       {/* ⭐ DECORATIVE STARS */}
-      <img
-        src="/star.svg"
-        className="absolute left-6 top-20 w-4 opacity-60 md:left-20 md:top-32 md:w-6"
-      />
-      <img
-        src="/star.svg"
-        className="absolute right-10 top-28 w-4 opacity-60 md:right-32 md:top-40 md:w-7"
-      />
-      <img
-        src="/star.svg"
-        className="absolute left-1/3 bottom-24 w-4 opacity-50 md:left-[35%] md:bottom-40 md:w-8"
-      />
-      <img
-        src="/star.svg"
-        className="absolute right-24 bottom-28 w-3 opacity-40 md:right-52 md:bottom-44 md:w-6"
-      />
+      <img src="/star.svg" className="absolute left-6 top-16 w-6 opacity-70 md:w-8" />
+      <img src="/star.svg" className="absolute right-10 top-24 w-7 opacity-60 md:w-9" />
+      <img src="/star.svg" className="absolute left-1/4 top-1/3 w-6 opacity-50 md:w-8" />
+      <img src="/star.svg" className="absolute right-1/4 top-1/4 w-5 opacity-40 md:w-7" />
+
+      <img src="/star.svg" className="absolute left-12 bottom-24 w-7 opacity-60 md:w-9" />
+      <img src="/star.svg" className="absolute right-20 bottom-32 w-6 opacity-50 md:w-8" />
+      <img src="/star.svg" className="absolute left-[45%] bottom-20 w-5 opacity-40 md:w-7" />
+      <img src="/star.svg" className="absolute right-[40%] top-[45%] w-6 opacity-50 md:w-8" />
+
+      <img src="/star.svg" className="absolute left-[10%] top-[55%] w-5 opacity-30 md:w-7" />
+      <img src="/star.svg" className="absolute right-[8%] bottom-[45%] w-6 opacity-40 md:w-8" />
 
       {/* ================= MAIN WRAPPER ================= */}
-      <div className="relative z-10 min-h-screen px-4 sm:px-8 lg:px-16 pt-24">
+      <div className="relative z-10 min-h-screen px-4 sm:px-8 lg:px-16 pt-16">
         <div
           className="
             max-w-[1500px]
             mx-auto
-            flex
-            flex-col
-            md:flex-row
-            items-center
-            md:items-start
+            grid
+            grid-cols-2
             gap-24
+            items-center
           "
         >
 
           {/* ================= LEFT SECTION ================= */}
-          <div
-            className="
-              w-full
-              md:w-1/2
-              flex
-              flex-col
-              items-center
-              md:items-start
-              text-center
-              md:text-left
-            "
-          >
+          <div className="w-full flex flex-col items-start">
 
             {/* HEADING */}
             <motion.h1
-              initial={{ opacity: 0, y: -30 }}
+              initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
               className="
-                font-[Julee]
-                text-[clamp(36px,5vw,76px)]
-                leading-none
+                heading
+                text-[clamp(30px,5vw,76px)]
+                leading-tight
                 tracking-wide
-                mb-8
+                mb-5
               "
               style={{ WebkitTextStroke: "1px black" }}
             >
@@ -75,15 +58,15 @@ export default function Landing2() {
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.25 }}
               className="
                 font-['Edu_TAS_Beginner']
-                text-[clamp(14px,1.6vw,18px)]
+                text-[clamp(13px,1.4vw,18px)]
                 leading-relaxed
                 tracking-wide
                 text-[#D9D9D9]
                 max-w-[620px]
-                mb-24
+                mb-6
               "
             >
               Vihaan isn’t just about building projects.
@@ -93,28 +76,20 @@ export default function Landing2() {
               and creating impact when the clock is ticking.
             </motion.p>
 
-            {/* CARD STACK */}
-            <div className="w-full flex justify-center md:justify-start mb-28">
+            {/* CARDS + BUTTONS */}
+            <div className="flex flex-col items-center gap-8 ">
               <CardStack />
-            </div>
 
-            {/* BUTTONS */}
-            <div className="flex gap-6 justify-center md:justify-start">
-              <FunkyButton text="SCHEDULE" />
-              <FunkyButton text="DOMAINS" variant="secondary" />
+              {/* 2rem gap ensured */}
+              <div className="flex gap-6 my-8">
+                <FunkyButton text="SCHEDULE" />
+                <FunkyButton text="DOMAINS" variant="secondary" />
+              </div>
             </div>
           </div>
 
           {/* ================= RIGHT SECTION ================= */}
-          <div
-            className="
-              w-full
-              md:w-1/2
-              flex
-              justify-center
-              md:justify-end
-            "
-          >
+          <div className="w-full flex justify-end">
             <div className="w-full max-w-[620px]">
               <Carousel />
             </div>
