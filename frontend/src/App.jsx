@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import Landing from './components/Landing.jsx'
+import Intro from './components/Loader.jsx'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+ 
+   const [showIntro, setshowIntro] = useState(true);
 
   return (
     <>
@@ -12,12 +14,18 @@ function App() {
         Hello world!
       </h1>
     </div> */}
+     {showIntro && (
     <div id='loader'>
-      Loading screen
+      <Intro onComplete={() => {
+        console.log('Intro complete!');
+        setshowIntro(false)}} />
     </div>
+     )}
+     {!showIntro && (
     <div id='landing'>
       <Landing></Landing>
     </div>
+     )}
     </>
   )
 }
