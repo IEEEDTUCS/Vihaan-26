@@ -20,10 +20,10 @@ const FINAL_TEXT = "VIHAAN 9.0";
 const CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*{}/<>";
 
 function Intro({ onComplete }) {
-  // Combine all images into one stable array for rendering
+  // Combine all images into one stable array
   const allImages = useMemo(() => [...actionPanels, finalImage], []);
 
-  const [currentImageIndex, setCurrentImageIndex] = useState(0); // Use index instead of src string for speed
+  const [currentImageIndex, setCurrentImageIndex] = useState(0); 
   const [isFinalState, setIsFinalState] = useState(false);
   const [imagesLoaded, setImagesLoaded] = useState(false);
    
@@ -31,7 +31,7 @@ function Intro({ onComplete }) {
   const [decryptedText, setDecryptedText] = useState(""); 
   const [isTextDone, setIsTextDone] = useState(false);
 
-  // 1. Preload Images (Browser Cache)
+  // 1. Preload Images
   useEffect(() => {
     let loadedCount = 0;
     const checkLoad = () => {
@@ -50,19 +50,20 @@ function Intro({ onComplete }) {
   useEffect(() => {
     if (!imagesLoaded) return;
 
-    // Loop through the first 9 images (indices 0 to 8)
+    // Loop interval
     const flipInterval = setInterval(() => {
       if (!isFinalState) {
         setCurrentImageIndex((prev) => (prev + 1) % actionPanels.length);
       }
     }, 150); 
 
+    // Start Text
     const textTimer = setTimeout(() => setShowDecryption(true), 3000);
 
+    // End Loop / Lock Final Image
     const finishTimer = setTimeout(() => {
       clearInterval(flipInterval);
-      // Set to the last image (index 9)
-      setCurrentImageIndex(actionPanels.length); 
+      setCurrentImageIndex(actionPanels.length); // Last image
       setIsFinalState(true);       
     }, 7000);
 
@@ -105,6 +106,23 @@ function Intro({ onComplete }) {
   return (
     <div className="fixed inset-0 w-screen h-screen overflow-hidden z-50 bg-black flex flex-col justify-center items-center">
       
+      {/* --- SKIP BUTTON --- */}
+      <motion.h1
+        onClick={onComplete}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1, duration: 0.5 }}
+        className="fixed top-6 right-6 z-100 text-white text-xl md:text-2xl hover:scale-110 transition-transform active:scale-95"
+        style={{
+          fontFamily: '"Bangers", system-ui',
+          WebkitTextStroke: "1px black",
+          letterSpacing: "0.1em",
+          cursor: "pointer"
+        }}
+      >
+        SKIP &gt;&gt;
+      </motion.h1>
+
       {/* STRIP CONTAINER */}
       <motion.div 
         initial={{ height: "40vh" }}
@@ -112,34 +130,23 @@ function Intro({ onComplete }) {
         transition={{ duration: 7, ease: "easeInOut" }}
         className="relative w-full border-y-4 border-white shadow-[0_0_30px_rgba(255,255,255,0.1)] bg-gray-900 overflow-hidden"
       >
-         {/* IMAGE LAYER CONTAINER */}
+         {/* IMAGE LAYER */}
          <motion.div
             className="w-full h-full relative"
             animate={{ filter: isFinalState ? "blur(0px) brightness(1)" : (showDecryption ? "blur(8px) brightness(0.6)" : "blur(0px) brightness(1)") }}
             transition={{ duration: 1.5 }}
          >
+             {/* Loop Images */}
              {allImages.map((src, index) => {
                const isActive = index === currentImageIndex;
-               
                return (
-                 <motion.div 
-                   key={src} 
-                   className="absolute inset-0 w-full h-full"
-                   initial={{ opacity: 0 }}
-                   animate={{ opacity: isActive ? 1 : 0 }}
-                   transition={{ duration: 0.15 }}
+                 <div 
+                    key={src} 
+                    className={`absolute inset-0 w-full h-full transition-opacity duration-0 ${isActive ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
                  >
-                    <img
-                      src={src}
-                      alt=""
-                      className="absolute inset-0 w-full h-full object-cover blur-xl scale-110 opacity-60"
-                    />
-                    <img
-                      src={src}
-                      alt=""
-                      className="absolute inset-0 w-full h-full object-contain z-10"
-                    />
-                 </motion.div>
+                    <img src={src} alt="" className="absolute inset-0 w-full h-full object-cover blur-xl scale-110 opacity-60" />
+                    <img src={src} alt="" className="absolute inset-0 w-full h-full object-contain" />
+                 </div>
                );
              })}
          </motion.div>
@@ -155,14 +162,14 @@ function Intro({ onComplete }) {
             className="relative transform -skew-x-12"
           >
             <span
-              className="select-none z-50 block text-6xl md:text-8xl lg:text-9xl xl:text-10xl 2xl:text-11xl"
+              className="select-none z-50 block text-[13vw] md:text-[9vw]" 
               style={{
-                fontFamily: '"Bangers", system-ui',
+                fontFamily: '"Bangers", system-ui', 
                 backgroundImage: "linear-gradient(to bottom, #FFD700 30%, #FF8C00 90%)",
                 backgroundClip: "text",
                 WebkitBackgroundClip: "text",
                 color: "transparent",
-                WebkitTextStroke: "1px black",
+                WebkitTextStroke: "1px black", 
                 filter: "drop-shadow(8px 8px 0px #000000)",
                 textAlign: "center",
                 lineHeight: "1",

@@ -70,6 +70,7 @@ const [open, setOpen] = useState(false);
   <img
     src="/vihaanlogo.svg"
     alt="logo"
+    className="cursor-pointer"
     style={{ width: "100px" }}
     onClick={reload}
   />
