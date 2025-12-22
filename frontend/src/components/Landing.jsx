@@ -101,7 +101,6 @@ const [open, setOpen] = useState(false);
       >
         ☰
       </div>
-
       {/* DROPDOWN */}
       {open && (
         <div
