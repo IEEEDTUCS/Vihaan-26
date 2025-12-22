@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Landing from './components/Landing.jsx'
 import Intro from './components/Loader.jsx'
+import Tracks from './components/Tracks.jsx'
 import './App.css'
 
 function App() {
@@ -9,11 +10,6 @@ function App() {
 
   return (
     <>
-    {/* <div>
-      <h1 className="text-3xl font-bold underline">
-        Hello world!
-      </h1>
-    </div> */}
      {showIntro && (
     <div id='loader'>
       <Intro onComplete={() => {
@@ -25,7 +21,11 @@ function App() {
     <div id='landing'>
       <Landing></Landing>
     </div>
+    
      )}
+     <div id='tracks'>
+      <Tracks></Tracks>
+    </div>
     </>
   )
 }
