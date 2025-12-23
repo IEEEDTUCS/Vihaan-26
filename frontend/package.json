@@ -12,10 +12,7 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
     "framer-motion": "^12.23.26",
-<<<<<<< HEAD
-=======
     "motion": "^12.23.26",
->>>>>>> main
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "tailwindcss": "^4.1.18"
