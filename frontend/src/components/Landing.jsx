@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 import "../App.css";
-import Button from "../utils/button";
+import Button from "../utils/button/button.jsx";
 
 export default function Landing() {
 
@@ -15,6 +15,10 @@ const [open, setOpen] = useState(false);
     window.addEventListener("resize", resize);
     return () => window.removeEventListener("resize", resize);
   }, []);
+
+  const reload = () => {
+    window.location.reload();
+  };
 
 
   return (
@@ -62,10 +66,13 @@ const [open, setOpen] = useState(false);
   }}
 >
   {/* LOGO */}
+  
   <img
     src="/vihaanlogo.svg"
     alt="logo"
+    className="cursor-pointer"
     style={{ width: "100px" }}
+    onClick={reload}
   />
 
   {/* DESKTOP NAV */}
@@ -171,21 +178,14 @@ const [open, setOpen] = useState(false);
           </p>
 
           {/* REGISTER INPUT */}
-          <div
-            style={{
-              fontFamily: "Gaegu, cursive",
-              fontSize: "clamp(16px, 3vw, 22px)",
-              letterSpacing: "0.05em",
-              marginBottom: "10px",
-            }}
+          <div className="reg"
           >
             REGISTER AT
            
            
           </div>
 
-          {/* ✅ UTILS BUTTON */}
-          <Button />
+          <Button text="Devfolio" />
         </div>
       </div>
     </div>
