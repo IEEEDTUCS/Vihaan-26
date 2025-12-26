@@ -1,0 +1,76 @@
+{
+    "faqs": [
+        {
+        "question": "What is Vihaan?",
+        "answer": "Vihaan 9.0 is the 9th edition of IEEE DTU’s 24-hour hackathon meant to challenge your creative potential and build innovative solutions to pressing problems. Every year for the last 9 years, we see participation from students across India.",
+        "bgColor": "#FFE500",
+        "borderColor": "orange",
+        "buttonPath": "/Faqs/ButtonClicks/NonClickv4.svg",
+        "textColor": "black"
+        },
+        {
+        "question": "A Hackathon?!",
+        "answer": "In general, a Hackathon is a 2-3 days long competition where programmers and enthusiasts brainstorm to come up with solutions to diverse problems faced by people and communities across the globe. They then have to code their solutions into a usable form.",
+        "bgColor": "#373773",
+        "borderColor": "DarkSlateBlue",
+        "buttonPath": "/Faqs/ButtonClicks/NonClickv2.svg",
+        "textColor": "white"
+        },
+        {
+        "question": "Coding? I don't know if I'm skilled enough...",
+        "answer": "Participation is the essential part, learning is the goal. You might need a basic idea of development. Vihaan serves as the perfect beginner hackathon for you to set your foot right into the world of development!",
+        "bgColor": "#3D6518",
+        "borderColor": "OliveDrab",
+        "buttonPath": "/Faqs/ButtonClicks/NonClickv3.svg",
+        "textColor": "white"
+        },
+        {
+        "question": "How do I register?!",
+        "answer": "Registrations for Vihaan 9.0 are not live yet. Stay Tuned ;-)",
+        "bgColor": "#5F005F",
+        "borderColor": "DarkViolet",
+        "buttonPath": "/Faqs/ButtonClicks/NonClickv1.svg",
+        "textColor": "white"
+        },
+        {
+        "question": "Spill the $$$",
+        "answer": "Serious cash prizes. Crazy swag. Zero chills. Stay Tuned!!",
+        "bgColor": "#FFE500",
+        "borderColor": "orange",
+        "buttonPath": "/Faqs/ButtonClicks/NonClickv4.svg",
+        "textColor": "black"
+        },
+        {
+        "question": "Anything from my side?",
+        "answer": "You'll just need your trusty laptop and a sufficient bandwidth internet connection. While we do provide power stations on the venue, the availability is subject to the crowd. Hence, we strongly recommend you charge up your devices to the brim. Oh and don't forget to register, Ofcourse!",
+        "bgColor": "#373773",
+        "borderColor": "DarkSlateBlue",
+        "buttonPath": "/Faqs/ButtonClicks/NonClickv2.svg",
+        "textColor": "white"
+        },
+        {
+        "question": "But I'm an introvert...",
+        "answer": "You can participate alone. However, we strongly recommend you to participate in teams since hackathons are all about brainstorming and teamwork!",
+        "bgColor": "#3D6518",
+        "borderColor": "OliveDrab",
+        "buttonPath": "/Faqs/ButtonClicks/NonClickv3.svg",
+        "textColor": "white"
+        },
+        {
+        "question": "Who is eligible to participate?",
+        "answer": "If you are currently (as of April 2026) enrolled in a university as a full-time student, suit up! Year or Branch do not matter.",
+        "bgColor": "#5F005F",
+        "borderColor": "DarkViolet",
+        "buttonPath": "/Faqs/ButtonClicks/NonClickv1.svg",
+        "textColor": "white"
+        },
+        {
+        "question": "An Entry Fee?!",
+        "answer": "Not at all! What we require is your passion and enthusiasm to build something awesome :D.",
+        "bgColor": "#FFE500",
+        "borderColor": "orange",
+        "buttonPath": "/Faqs/ButtonClicks/NonClickv4.svg",
+        "textColor": "black"
+        }
+    ]
+}
