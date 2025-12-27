@@ -12,7 +12,7 @@ export default function Faqs() {
         <div style={{zIndex: '0'}}>
           <div className="flex justify-center items-center">
             <h1
-              className="heading mt-16 text-center break-words lg:whitespace-nowrap"
+              className="heading mt-16 text-center wrap-break-words lg:whitespace-nowrap"
               style={{
               position: 'relative',
               fontSize: "clamp(48px, 8vw, 112px)",
