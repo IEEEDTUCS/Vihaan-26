@@ -14,7 +14,7 @@ export default function About({ isVisible, setIsVisible }) {
           onClick={() => setIsVisible(false)}
         />
       )}
-      <div className={`About fixed top-0 right-0 z-10000 transition-transform duration-300 ease-in-out ${
+      <div className={`About fixed overflow-y-auto overflow-x-hidden top-0 right-0 z-10000 transition-transform duration-300 ease-in-out ${
         isVisible ? 'translate-x-0' : 'translate-x-full'
       }`}>
         <Header isVisible={isVisible} setIsVisible={setIsVisible} />
