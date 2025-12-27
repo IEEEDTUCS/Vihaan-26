@@ -64,7 +64,7 @@ const Tracks = () => {
 
   {/* HEADING (TOP MOST) */}
   <h1
-    className="relative z-10 heading text-white w-full mt-20 mx-auto text-center"
+    className="relative z-5 mb-5 heading text-white w-full mt-20 mx-auto text-center"
     style={{ fontSize: "clamp(48px, 10vw, 100px)" }}
   >
     Tracks:

@@ -7,18 +7,42 @@ import {
   SwapySlot,
 } from "../../component/uilayouts/swapy.jsx";
 import "./gallery-swapy.css";
+
 function SvgCard({ src, name }) {
   return (
-    <div className="bg-white rounded-xl h-full flex items-center justify-center p-6 shadow-md">
+    <div className="relative bg-black rounded-2xl h-full w-full overflow-hidden shadow-lg">
+      
+      {/* BLURRED BACKGROUND */}
       <img
         src={src}
-        alt={name}
-        className="w-full h-full object-contain"
+        alt=""
+        aria-hidden
+        className="
+          absolute inset-0 w-full h-full object-cover
+          scale-110 blur-xl opacity-50
+        "
         draggable={false}
       />
+
+      {/* DARK OVERLAY (optional, improves contrast) */}
+      <div className="absolute inset-0 bg-black/40" />
+
+      {/* FOREGROUND IMAGE */}
+      <div className="relative z-0 h-full w-full flex items-center justify-center p-4">
+        <img
+          src={src}
+          alt={name}
+          className="
+            w-full h-full object-contain
+            rounded-xl
+          "
+          draggable={false}
+        />
+      </div>
     </div>
   );
 }
+
 
 const initialItems = [
   {
@@ -28,7 +52,7 @@ const initialItems = [
   },
   {
     id: "2",
-    widgets: <SvgCard src="/Gallerysvgs/img3.svg" name="img3" />,
+    widgets: <SvgCard src="/cards3.svg" name="img3" />,
     className: "col-span-4",
   },
   {
@@ -81,13 +105,12 @@ function DefaultSwapy() {
   return (
     <div className="swapy-scope">
       <h1
-        className="heading mt-20 gallery-heading"
-        style={{
-          fontSize: "clamp(48px, 10vw, 100px)",
-        }}
-      >
-        Gallery
-      </h1>
+  className="heading mt-20 mb-5 text-center w-full gallery-heading"
+  style={{ fontSize: "clamp(48px, 10vw, 100px)" ,filter: "drop-shadow(3px 3px 0 white)" }}
+>
+  Gallery:
+</h1>
+
 
       <SwapyLayout
         id="swapy"

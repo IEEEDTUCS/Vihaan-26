@@ -4,9 +4,7 @@ import "../../App.css";
 import { createPortal } from "react-dom";
 
 export default function Landing() {
-    return (
-    <div>Landing</div>
-  )
+
   const [mobile, setMobile] = useState(window.innerWidth < 900);
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);

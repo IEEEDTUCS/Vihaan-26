@@ -75,9 +75,6 @@ function App() {
             <Gallery />
           </div>
 
-      <div id="Gallery">
-        <Gallery/>
-      </div>
           <div id="faqs">
             <Faqs />
           </div>
