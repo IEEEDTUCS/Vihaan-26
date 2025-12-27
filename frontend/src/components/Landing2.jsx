@@ -1,6 +1,8 @@
 import CardStack from "../utils/CardStack";
 import FunkyButton from "../utils/FunkyButton";
 import { motion } from "framer-motion";
+import { useState } from "react";
+import About from "./About/About.jsx";
 
 const starBlink = {
   animate: {
@@ -15,26 +17,31 @@ const starBlink = {
 };
 
 export default function Landing2() {
+    const [isVisible, setIsVisible] = useState(false)
   return (
+    <>
+    <div className="relative ">
+        <About isVisible={isVisible} setIsVisible={setIsVisible}></About>
+    </div>
     <section className="relative min-h-screen w-full text-white overflow-hidden">
 
       {/* Border */}
       <img
         src="/aboutUsBorder.svg"
         alt="Decorative Border"
-        className="pointer-events-none absolute top-0 left-0 z-30 w-[70%] h-[50%]"
+        className="pointer-events-none absolute top-0 left-0 z-0 w-[70%] h-[50%]"
       />
 
       <img
         src="/aboutUsBorder.svg"
         alt="Decorative Border"
-        className="pointer-events-none absolute bottom-0 left-0 z-30 w-[40%] h-[20%]"
+        className="pointer-events-none absolute bottom-0 left-0 z-0 w-[40%] h-[20%]"
       />
 
       <img
         src="/aboutUsBorder.svg"
         alt="Decorative Border"
-        className="pointer-events-none absolute bottom-0 right-0 z-30 w-[40%] h-[30%]"
+        className="pointer-events-none absolute bottom-0 right-0 z-0 w-[40%] h-[30%]"
       />
 
       {/* Stars */}
@@ -60,10 +67,10 @@ export default function Landing2() {
       </div>
 
       {/* Gradient */}
-      <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/50 via-black/30 to-black/70" />
+      <div className="absolute inset-0 z-0 bg-gradient-to-b from-black/50 via-black/30 to-black/70" />
 
       {/* Main Content */}
-      <div className="relative z-20 min-h-screen px-[2rem] sm:px-[3.5rem] lg:px-[6.5rem] pt-[6.5rem] pb-[6rem]">
+      <div className="relative z-0 min-h-screen px-[2rem] sm:px-[3.5rem] lg:px-[6.5rem] pt-[6.5rem] pb-[6rem]">
         <div className="max-w-[96rem] mx-auto flex items-center justify-between gap-[6rem]">
 
           {/* LEFT */}
@@ -137,7 +144,7 @@ export default function Landing2() {
               transition={{ duration: 0.6, delay: 0.45 }}
               className="mt-[3.25rem]"
             >
-              <FunkyButton text="ABOUT IEEE DTU" />
+              <FunkyButton text="ABOUT IEEE DTU" isVisible={isVisible} setIsVisible={setIsVisible} />
             </motion.div>
           </div>
 
@@ -151,5 +158,6 @@ export default function Landing2() {
         </div>
       </div>
     </section>
+    </>
   );
 }

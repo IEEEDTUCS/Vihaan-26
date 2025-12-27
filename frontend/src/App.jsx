@@ -30,21 +30,20 @@ function App() {
         </div>
       )}
       
+      <div id="about">
+        <Landing2 />
+      </div>
 
       <div id="tracks">
         <Tracks />
       </div>
-
-      <div id="landing2">
-        <Landing2 />
+      
+      <div id="Gallery">
+        <Gallery></Gallery>
       </div>
 
       <div id='faqs'>
         <Faqs />
-      </div>
-      
-      <div id="Gallery">
-        <Gallery></Gallery>
       </div>
 
       <div id="footer">

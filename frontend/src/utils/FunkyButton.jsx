@@ -1,15 +1,16 @@
 import { motion } from "motion/react";
 
-export default function FunkyButton({ text, variant = "primary" }) {
+export default function FunkyButton({ text, variant = "primary" , isVisible , setIsVisible}) {
   const isPrimary = variant === "primary";
 
   return (
     <motion.button
+      onClick={() => setIsVisible(!isVisible)}
       type="button"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ scale: 1.05, y: -3 }}
-      whileTap={{ scale: 0.96 }}
+      whileHover={{ scale: 1.05, backgroundColor: isPrimary ? "#ffffff" : "#000000", color: isPrimary ? "#000000" : "#ffffff" }}
+      whileTap={{ scale: 0.96 , backgroundColor: isPrimary ? "#ffffff" : "#000000", color: isPrimary ? "#000000" : "#ffffff" }}
       transition={{
         type: "spring",
         stiffness: 280,

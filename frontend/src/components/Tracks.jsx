@@ -15,15 +15,71 @@ const Tracks = () => {
 
   return (
     <>
-      <h1
-        className="heading mt-20"
-        style={{ fontSize: "clamp(48px, 10vw, 100px)" }}
-      >
-        Tracks:
-      </h1>
+<div className="relative w-full overflow-hidden">
+  {/* LEFT SPOT */}
+  <div
+    className="absolute z-0 pointer-events-none"
+    style={{
+      top: "10vh",
+      left: "0vw",
+      width: "50vw",
+      height: "40vh",
+      backgroundImage: "url(/Faqs/SpotPattern.svg)",
+      backgroundRepeat: "no-repeat",
+      backgroundSize: "75vw 75vh",
+      backgroundPosition: "-10vw -25vh",
+    }}
+  />
+
+  {/* RIGHT SPOT */}
+  <div
+    className="absolute z-0 pointer-events-none"
+    style={{
+      top: "10vh",
+      right: "0vw",
+      width: "50vw",
+      height: "40vh",
+      backgroundImage: "url(/Faqs/SpotPattern.svg)",
+      backgroundRepeat: "no-repeat",
+      backgroundSize: "50vw 75vh",
+      backgroundPosition: "0 -25vh",
+    }}
+  />
+
+  {/* BACKGROUND IMAGE (behind text) */}
+  <img
+    src="/about_us.svg"
+    alt=""
+    className="
+      absolute inset-0
+      mx-auto
+      z-5
+      w-[70vw] max-w-[900px]
+      opacity-80
+      pointer-events-none
+      md:-top-20
+      top-10
+ "
+  />
+
+  {/* HEADING (TOP MOST) */}
+  <h1
+    className="relative z-10 heading text-white w-full mt-20 mx-auto text-center"
+    style={{ fontSize: "clamp(48px, 10vw, 100px)" }}
+  >
+    Tracks:
+  </h1>
+</div>
+
 
       {/* CAROUSEL */}
       <div className="banner">
+        
+      <img
+        src="/aboutUsBorder.svg"
+        alt="Decorative Border"
+        className="pointer-events-none absolute bottom-0 right-0 -z-1 w-[40%] h-[30%]"
+      />
         <div className="slider" style={{ "--quantity": 7 }}>
           {[...Array(7)].map((_, index) => (
             <div
