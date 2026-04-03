@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Document, Schema, CallbackError } from "mongoose";
 import bcrypt from "bcrypt";
 
 /**
@@ -55,7 +55,7 @@ const AdminSchema = new Schema<IAdmin>(
 /**
  * 🔐 Hash password before saving
  */
-AdminSchema.pre("save", async function (next) {
+AdminSchema.pre("save", async function (next: (err?: CallbackError) => void) {
     if (!this.isModified("password")) return next();
 
     const salt = await bcrypt.genSalt(10);

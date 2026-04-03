@@ -15,6 +15,7 @@ export interface IUser extends Document {
     is_present: boolean;
     food_count: number;
     bedsheet_taken: number;
+    room_allot: string | null;
 
     createdAt: Date;
     updatedAt: Date;
@@ -86,6 +87,11 @@ const UserSchema = new Schema<IUser>(
             type: Number,
             default: 0,
             min: 0,
+        },
+
+        room_allot: {
+            type: String,
+            default: null,
         },
     },
     {
