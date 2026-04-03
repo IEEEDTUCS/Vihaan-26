@@ -1,6 +1,5 @@
 import mongoose, { Document, Schema, CallbackError } from "mongoose";
 import bcrypt from "bcrypt";
-
 /**
  * Admin Interface
  */
@@ -55,13 +54,11 @@ const AdminSchema = new Schema<IAdmin>(
 /**
  * 🔐 Hash password before saving
  */
-AdminSchema.pre("save", async function (next: (err?: CallbackError) => void) {
-    if (!this.isModified("password")) return next();
+AdminSchema.pre("save", async function () {
+    if (!this.isModified("password")) return;
 
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
-
-    next();
 });
 
 /**
@@ -74,9 +71,8 @@ AdminSchema.methods.comparePassword = async function (
 };
 
 /**
- * Index
+ * Index — email already has unique:true so no need to re-declare
  */
-AdminSchema.index({ email: 1 });
 
 /**
  * Export Model

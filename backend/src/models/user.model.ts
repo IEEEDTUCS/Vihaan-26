@@ -102,7 +102,6 @@ const UserSchema = new Schema<IUser>(
  * Indexes
  */
 UserSchema.index({ team_id: 1 });
-UserSchema.index({ email: 1 });
 UserSchema.index({ rsvp_code: 1 });
 UserSchema.index({ qr_hash: 1 });
 

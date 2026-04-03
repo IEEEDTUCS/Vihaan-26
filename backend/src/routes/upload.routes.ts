@@ -4,7 +4,7 @@ import { handleCSVUpload } from "../controllers/upload.controller";
 
 const router = Router();
 
-// Store file in memory as buffer (no disk writes)
+// Store file in memory as buffer 
 const upload = multer({
     storage: multer.memoryStorage(),
     fileFilter: (_req, file, cb) => {

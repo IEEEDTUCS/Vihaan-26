@@ -5,6 +5,7 @@
     "esModuleInterop": true,
     "verbatimModuleSyntax": false,
     "rootDir": "./src",
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "types": ["jest", "node"]
   }
 }
