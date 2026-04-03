@@ -1,10 +1,10 @@
 import { Router } from "express";
 import multer from "multer";
 import { handleCSVUpload } from "../controllers/upload.controller";
+import { adminAuth } from "../middlewares/adminAuth";
 
 const router = Router();
 
-// Store file in memory as buffer 
 const upload = multer({
     storage: multer.memoryStorage(),
     fileFilter: (_req, file, cb) => {
@@ -16,8 +16,7 @@ const upload = multer({
     },
 });
 
-// POST /api/upload/csv
-// multipart/form-data with field name "file"
-router.post("/csv", upload.single("file"), handleCSVUpload);
+// POST /api/upload/csv  — admin only
+router.post("/csv", adminAuth, upload.single("file"), handleCSVUpload);
 
 export default router;

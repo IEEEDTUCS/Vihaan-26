@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema, CallbackError } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 import bcrypt from "bcrypt";
 /**
  * Admin Interface
@@ -69,10 +69,6 @@ AdminSchema.methods.comparePassword = async function (
 ): Promise<boolean> {
     return bcrypt.compare(candidatePassword, this.password);
 };
-
-/**
- * Index — email already has unique:true so no need to re-declare
- */
 
 /**
  * Export Model
