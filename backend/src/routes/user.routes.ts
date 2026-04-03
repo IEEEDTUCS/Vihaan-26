@@ -22,15 +22,15 @@ router.post("/login", validate(userLoginSchema), wrapAsync(userLogin));
 router.get("/me", userAuth, wrapAsync(userMe));
 
 // Scan QR (GET User by QR)
-router.get("/:qrHash", adminAuth, wrapAsync(findUserByQrCode));
+router.get("/scan/:qrHash", adminAuth, wrapAsync(findUserByQrCode));
 
 // Link User to QR
 router.post("/linkQr", adminAuth, wrapAsync(linkUserToQrCode))
 
 // Mark User Present
-router.post("/:qrHash/present", adminAuth, wrapAsync(markUserPresent));
+router.post("/scan/:qrHash/present", adminAuth, wrapAsync(markUserPresent));
 
 // Update User Fields By Volunteer
-router.put("/:qrHash/volunteer", adminAuth, wrapAsync(userVolunteerUpdatePayload));
+router.put("/scan/:qrHash/update", adminAuth, wrapAsync(userVolunteerUpdatePayload));
 
 export default router;
