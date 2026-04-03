@@ -69,7 +69,6 @@ const UserSchema = new Schema<IUser>(
         qr_hash: {
             type: String,
             default: null,
-            index: true, // useful for QR scanning
         },
 
         is_present: {
