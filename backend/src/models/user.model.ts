@@ -15,6 +15,7 @@ export interface IUser extends Document {
     is_present: boolean;
     food_count: number;
     bedsheet_taken: number;
+    room_allot: string | null;
 
     createdAt: Date;
     updatedAt: Date;
@@ -68,7 +69,6 @@ const UserSchema = new Schema<IUser>(
         qr_hash: {
             type: String,
             default: null,
-            index: true, // useful for QR scanning
         },
 
         is_present: {
@@ -87,6 +87,11 @@ const UserSchema = new Schema<IUser>(
             default: 0,
             min: 0,
         },
+
+        room_allot: {
+            type: String,
+            default: null,
+        },
     },
     {
         timestamps: true,
@@ -97,7 +102,6 @@ const UserSchema = new Schema<IUser>(
  * Indexes
  */
 UserSchema.index({ team_id: 1 });
-UserSchema.index({ email: 1 });
 UserSchema.index({ rsvp_code: 1 });
 UserSchema.index({ qr_hash: 1 });
 
