@@ -1,10 +1,10 @@
-import mongoose, { Document, Schema, Types } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 
 /*
  * User Interface
  */
 export interface IUser extends Document {
-    team_id: Types.ObjectId;
+    team_id: string;
     team_name: string;
     username: string;
     rsvp_code: string;
@@ -28,8 +28,7 @@ export interface IUser extends Document {
 const UserSchema = new Schema<IUser>(
     {
         team_id: {
-            type: Schema.Types.ObjectId,
-            ref: "Team",
+            type: String,
             required: true,
             unique: true,
             index: true,
