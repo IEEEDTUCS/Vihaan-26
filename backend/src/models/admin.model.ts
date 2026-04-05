@@ -5,7 +5,6 @@ import bcrypt from "bcrypt";
  */
 export interface IAdmin extends Document {
     name: string;
-    email: string;
     password: string;
     role: "SUPER_ADMIN" | "VOLUNTEER";
 
@@ -23,14 +22,6 @@ const AdminSchema = new Schema<IAdmin>(
         name: {
             type: String,
             required: true,
-            trim: true,
-        },
-
-        email: {
-            type: String,
-            required: true,
-            unique: true,
-            lowercase: true,
             trim: true,
         },
 
@@ -55,7 +46,7 @@ const AdminSchema = new Schema<IAdmin>(
  * 🔐 Hash password before saving
  */
 AdminSchema.pre("save", async function () {
-    if (!this.isModified("password")) return;
+    if (!this.isModified("password")) return;//for update operations, only hash if password is modified(mp update route wont be keeping)
 
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);

@@ -8,6 +8,7 @@ export const validate =
         if (!result.success) {
             const errors = result.error.issues.map((e) => e.message);
             res.status(400).json({ success: false, errors });
+            console.log("Validation errors:", errors);
             return;
         }
         req.body = result.data;

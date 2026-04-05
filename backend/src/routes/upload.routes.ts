@@ -20,3 +20,6 @@ const upload = multer({
 router.post("/csv", adminAuth, upload.single("file"), handleCSVUpload);
 
 export default router;
+
+//delete afterwards 
+// image upload here

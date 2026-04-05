@@ -5,12 +5,14 @@ import { generateUserToken } from "../utils/generateToken";
 import ExpressError from "../utils/expressError";
 
 export const userLogin = async (req: Request, res: Response) => {
-    const { email, rsvp_code } = req.body;
+    const { email, code } = req.body;
 
     const user = await User.findOne({ email });
     if (!user) throw new ExpressError(401, "Invalid credentials");
+    let password = user.qr_hash !== null ? user.qr_hash + user.rsvp_code : null ;
+    if (password === null) throw new ExpressError(401, "User not registered.");
 
-    if (user.rsvp_code !== rsvp_code) throw new ExpressError(401, "Invalid credentials");
+    if (password !== code) throw new ExpressError(401, "Invalid credentials");
 
     const token = generateUserToken(String(user._id), String(user.team_id), user.role);
 
@@ -34,7 +36,7 @@ export const userMe = async (req: Request, res: Response) => {
     const user = req.user as any;
 
     const team = await Team.findById(user.team_id).select(
-        "team_name team_id type category checkpoints avg_points stars room_number panel_number"
+        "team_name team_id type category checkpoints room_number panel_number"
     );
 
     res.status(200).json({
@@ -87,7 +89,7 @@ export const linkUserToQrCode = async (req: Request, res: Response) => {
     const user = await User.findOne({qr_hash: qrHash})
     if (user) throw new ExpressError(400, "QR is already linked with a user");
 
-    const update = await User.findOneAndUpdate({rsvpCode: rsvpCode}, {qr_hash: qrHash}, {returnDocument: 'after'})
+    const update = await User.findOneAndUpdate({rsvp_code: rsvpCode}, {qr_hash: qrHash}, {returnDocument: 'after'})
     if (!update) throw new ExpressError(404, "User not found");
 
     res.status(200).json({
@@ -134,7 +136,7 @@ export const markUserPresent = async (req: Request, res: Response) => {
 }
 
 interface userVolunteerUpdatePayload {
-    foodCountInc?: boolean;
+    foodCountInc?: number;
     roomAllot?: string;
     bedsheetTakenInc?: boolean;
 }
@@ -151,7 +153,7 @@ export const userVolunteerUpdatePayload = async (req: Request, res: Response) =>
     const updateQuery: any = {};
 
     if (payload.foodCountInc) {
-        updateQuery.$inc = { ...(updateQuery.$inc || {}), food_count: 1 };
+        updateQuery.$set = { ...(updateQuery.$inc || {}), food_count: payload.foodCountInc };
     }
 
     if (payload.bedsheetTakenInc) {

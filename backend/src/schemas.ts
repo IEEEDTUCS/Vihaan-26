@@ -9,12 +9,12 @@ const url = (msg: string) => z.url(msg);
 // ─── Admin ───────────────────────────────────────────────────────────────────
 
 export const adminLoginSchema = z.object({
-    email,
+    username: z.string().min(2, "Username must be at least 2 characters").max(100).trim(),
     password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 export const adminRegisterSchema = z.object({
-    name: z.string().min(2, "Name must be at least 2 characters").trim(),
+    username: z.string().min(2, "Username must be at least 2 characters").max(100).trim(),
     email,
     password: z.string().min(6, "Password must be at least 6 characters"),
     role: z.enum(["SUPER_ADMIN", "VOLUNTEER"]).default("VOLUNTEER"),
@@ -23,8 +23,8 @@ export const adminRegisterSchema = z.object({
 // ─── User Login ───────────────────────────────────────────────────────────────
 
 export const userLoginSchema = z.object({
-    email,
-    rsvp_code: z.string().regex(/^\d{6}$/, "RSVP code must be exactly 6 digits"),
+  email,
+  code: z.string().regex(/^\d{12}$/, "Code must be exactly 12 digits"),
 });
 
 // ─── CSV Upload (single row parsed from CSV) ──────────────────────────────────

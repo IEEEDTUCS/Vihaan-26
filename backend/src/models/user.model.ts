@@ -5,6 +5,7 @@ import mongoose, { Document, Schema, Types } from "mongoose";
  */
 export interface IUser extends Document {
     team_id: Types.ObjectId;
+    team_name: string;
     username: string;
     rsvp_code: string;
     email: string;
@@ -14,7 +15,7 @@ export interface IUser extends Document {
     qr_hash?: string | null;
     is_present: boolean;
     food_count: number;
-    bedsheet_taken: number;
+    bedsheet_taken: boolean;
     room_allot: string | null;
 
     createdAt: Date;
@@ -30,7 +31,14 @@ const UserSchema = new Schema<IUser>(
             type: Schema.Types.ObjectId,
             ref: "Team",
             required: true,
+            unique: true,
             index: true,
+        },
+
+        team_name: {
+            type: String,
+            required: true,
+            trim: true,
         },
 
         username: {
@@ -68,7 +76,9 @@ const UserSchema = new Schema<IUser>(
 
         qr_hash: {
             type: String,
+            unique: true,
             default: null,
+            sparse: true, // Allow multiple null values
         },
 
         is_present: {
@@ -83,9 +93,8 @@ const UserSchema = new Schema<IUser>(
         },
 
         bedsheet_taken: {
-            type: Number,
-            default: 0,
-            min: 0,
+            type: Boolean,
+            default: false,
         },
 
         room_allot: {
@@ -97,12 +106,5 @@ const UserSchema = new Schema<IUser>(
         timestamps: true,
     }
 );
-
-/**
- * Indexes
- */
-UserSchema.index({ team_id: 1 });
-UserSchema.index({ rsvp_code: 1 });
-UserSchema.index({ qr_hash: 1 });
 
 export const User = mongoose.model<IUser>("Student", UserSchema);

@@ -20,7 +20,7 @@ router.post("/login", validate(userLoginSchema), wrapAsync(userLogin));
 
 // GET /api/user/me  (protected)
 router.get("/me", userAuth, wrapAsync(userMe));
-
+//user routes here like submitting links and images and deatils (use findone and update for each time as multiple uploads can be there with timings check also at backend side)
 // Scan QR (GET User by QR)
 router.get("/scan/:qrHash", adminAuth, wrapAsync(findUserByQrCode));
 

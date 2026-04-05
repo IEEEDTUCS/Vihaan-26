@@ -7,6 +7,9 @@ import { wrapAsync } from "../utils/wrapAsync";
 
 const router = Router();
 
+
+//create admin 
+
 // POST /api/admin/login
 router.post("/login", validate(adminLoginSchema), wrapAsync(adminLogin));
 

@@ -6,8 +6,7 @@ import mongoose, { Document, Schema } from "mongoose";
 export interface ICheckpoint {
     round_num: number;
     checkpoint_time: Date;
-    commit_link: string | null;
-    image: string | null;
+    submit_link: string | null;//can be repo link or image link
     submitted_at: Date | null;
     status: "PENDING" | "VERIFIED" | "SUSPICIOUS";
 }
@@ -20,16 +19,15 @@ export interface ITeam extends Document {
     team_name: string;
 
     // Project submission fields
-    repo_link: string | null;
-    image: string | null;
+    repo_or_image_link: string | null;
     type: "WOMEN" | "FRESHERS" | "IEEE" | "SOFTWARE" | "HARDWARE" | null;
-    category: string[];
+    category: string[];//keep in frontend
     description: string | null;
     room_number: string | null;
     ppt_link: string | null;
     panel_number: string | null;
     avg_points: number;
-    stars: number;
+    stars: number;//1 to 5 
 
     // Checkpoints (4 rounds, embedded)
     checkpoints: ICheckpoint[];
@@ -51,11 +49,7 @@ const CheckpointSchema = new Schema<ICheckpoint>(
             type: Date,
             required: true,
         },
-        commit_link: {
-            type: String,
-            default: null,
-        },
-        image: {
+        submit_link: {
             type: String,
             default: null,
         },
@@ -75,11 +69,11 @@ const CheckpointSchema = new Schema<ICheckpoint>(
 /**
  * Default 4 checkpoints with predecided times
  */
-const defaultCheckpoints = (): ICheckpoint[] => [
-    { round_num: 1, checkpoint_time: new Date("2026-04-04T21:00:00+05:30"), commit_link: null, image: null, submitted_at: null, status: "PENDING" },
-    { round_num: 2, checkpoint_time: new Date("2026-04-05T01:00:00+05:30"), commit_link: null, image: null, submitted_at: null, status: "PENDING" },
-    { round_num: 3, checkpoint_time: new Date("2026-04-05T05:00:00+05:30"), commit_link: null, image: null, submitted_at: null, status: "PENDING" },
-    { round_num: 4, checkpoint_time: new Date("2026-04-05T09:00:00+05:30"), commit_link: null, image: null, submitted_at: null, status: "PENDING" },
+const defaultCheckpoints = (): ICheckpoint[] => [//change times as per schedule
+    { round_num: 1, checkpoint_time: new Date("2026-04-04T21:00:00+05:30"), submit_link: null, submitted_at: null, status: "PENDING" },
+    { round_num: 2, checkpoint_time: new Date("2026-04-05T01:00:00+05:30"), submit_link: null, submitted_at: null, status: "PENDING" },
+    { round_num: 3, checkpoint_time: new Date("2026-04-05T05:00:00+05:30"), submit_link: null, submitted_at: null, status: "PENDING" },
+    { round_num: 4, checkpoint_time: new Date("2026-04-05T09:00:00+05:30"), submit_link: null, submitted_at: null, status: "PENDING" },
 ];
 
 /**
@@ -98,11 +92,7 @@ const TeamSchema = new Schema<ITeam>(
             required: true,
             trim: true,
         },
-        repo_link: {
-            type: String,
-            default: null,
-        },
-        image: {
+        repo_or_image_link: {
             type: String,
             default: null,
         },
@@ -120,7 +110,7 @@ const TeamSchema = new Schema<ITeam>(
             default: null,
             trim: true,
         },
-        room_number: {
+        room_number: {//by volunteer at checkin
             type: String,
             default: null,
         },
@@ -128,7 +118,7 @@ const TeamSchema = new Schema<ITeam>(
             type: String,
             default: null,
         },
-        panel_number: {
+        panel_number: {//by admin
             type: String,
             default: null,
         },
@@ -141,6 +131,7 @@ const TeamSchema = new Schema<ITeam>(
             type: Number,
             default: 0,
             min: 0,
+            max: 5,
         },
         checkpoints: {
             type: [CheckpointSchema],

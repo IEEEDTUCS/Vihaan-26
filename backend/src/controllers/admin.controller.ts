@@ -3,10 +3,14 @@ import { Admin } from "../models/admin.model";
 import { generateAdminToken } from "../utils/generateToken";
 import ExpressError from "../utils/expressError";
 
-export const adminLogin = async (req: Request, res: Response) => {
-    const { email, password } = req.body;
 
-    const admin = await Admin.findOne({ email });
+//create admin 
+
+
+export const adminLogin = async (req: Request, res: Response) => {
+    const { username, password } = req.body;
+
+    const admin = await Admin.findOne({ name : username });
     if (!admin) throw new ExpressError(401, "Invalid credentials");
 
     const isMatch = await admin.comparePassword(password);
@@ -20,7 +24,6 @@ export const adminLogin = async (req: Request, res: Response) => {
         admin: {
             id: admin._id,
             name: admin.name,
-            email: admin.email,
             role: admin.role,
         },
     });

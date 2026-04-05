@@ -5,16 +5,49 @@ import uploadRoutes from "./routes/upload.routes";
 import adminRoutes from "./routes/admin.routes";
 import userRoutes from "./routes/user.routes";
 import ExpressError from "./utils/expressError";
+import rateLimit from "express-rate-limit";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
 
-app.use(cors());
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || "")
+    .split(",")
+    .map(origin => origin.trim())
+    .filter(Boolean);
+
+  app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+
+    if (origin.endsWith(".vercel.app")) {
+      return callback(null, true);
+    }
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, origin);
+    } else {
+      return callback(new ExpressError(201, "Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // connect DB
 connectDB();
 
+//cors setup and rate limiting
+const limiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 500, // 500 requests per minute per IP
+  message: "Too many requests, slow down!"
+});
+
+app.use(limiter);
 // Routes
 app.use("/api/upload", uploadRoutes);
 app.use("/api/admin", adminRoutes);

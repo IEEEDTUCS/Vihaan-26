@@ -46,3 +46,5 @@ export const superAdminOnly = (req: Request, _res: Response, next: NextFunction)
     }
     next();
 };
+
+//admin creation protection here
