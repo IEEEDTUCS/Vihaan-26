@@ -7,6 +7,32 @@ interface CSVRow {
     [key: string]: string;
 }
 
+const generatedCodes = new Set<string>();
+
+const generateRSVP = (email: string): string => {
+  let handle = email.split("@")[0];
+    // ✅ Remove all non-alphanumeric characters
+  handle = handle.replace(/[^a-zA-Z0-9]/g, "");
+
+  // ✅ Create prefix safely
+  const prefix = handle.slice(0, 3).padEnd(3, "X").toUpperCase();
+
+  let code: string;
+
+  while (true) {
+    const digits = Math.floor(Math.random() * 100000) // 5 digits
+      .toString()
+      .padStart(5, "0");
+
+    code = `${prefix}${digits}`; // total = 8 chars
+
+    if (!generatedCodes.has(code)) {
+      generatedCodes.add(code);
+      if(code.length !== 8)console.log(`Generated RSVP code: ${code}`);
+      return code;
+    }
+  }
+};
 /**
  * Normalize role string from Unstop CSV to LEADER | MEMBER
  */
@@ -50,8 +76,7 @@ export const uploadCSV = async (buffer: Buffer) => {
             team_name: raw["Team Name"] ?? "",
             username: raw["Candidate's Name"] ?? raw["Name"] ?? "",
             email: raw["Candidate's Email"] ?? raw["Email"] ?? "",
-            college_name: raw["College"] ?? raw["College Name"] ?? "",
-            rsvp_code: raw["Reg. Stan Ref Code"] ?? raw["RSVP Code"] ?? "",
+            college_name: raw["Candidate's Organisation"] ?? raw["College Name"] ?? "",
             role: normalizedRole,
         };
 
@@ -65,7 +90,7 @@ export const uploadCSV = async (buffer: Buffer) => {
             continue;
         }
 
-        const { team_id, team_name, username, email, college_name, rsvp_code, role } = parsed.data;
+        const { team_id, team_name, username, email, college_name, role } = parsed.data;
 
         try {
             // Upsert team
@@ -83,10 +108,11 @@ export const uploadCSV = async (buffer: Buffer) => {
 
             await User.create({
                 team_id: team._id,
+                team_name,
                 username,
                 email,
                 college_name,
-                rsvp_code,
+                rsvp_code: generateRSVP(email),
                 role,
             });
 

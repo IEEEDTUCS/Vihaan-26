@@ -51,7 +51,8 @@ const UserSchema = new Schema<IUser>(
             type: String,
             required: true,
             unique: true,
-            match: [/^\d{6}$/, "RSVP code must be 6 digits"],
+            sparse: true, // Allow multiple null values
+            match: [/^[A-Z0-9]{8}$/, "RSVP code must be 8 digits"],
         },
 
         email: {

@@ -48,3 +48,21 @@ export const superAdminOnly = (req: Request, _res: Response, next: NextFunction)
 };
 
 //admin creation protection here
+export const createCheck = (req: Request, _res: Response, next: NextFunction) => {
+    const key = req.headers["x-admin-key"];
+    try {
+        if (!key || typeof key !== "string") {
+        return next(new ExpressError(400, "Admin creation key is required"));
+    }
+    if (process.env.ADMIN_CREATION_KEY) {
+        
+        if (key !== process.env.ADMIN_CREATION_KEY) {
+            return next(new ExpressError(403, "Invalid admin creation key"));
+        }
+    }
+    } catch (error) {
+        return next(new ExpressError(500, "Server error during admin creation key validation"));
+    }
+    
+    next();
+};

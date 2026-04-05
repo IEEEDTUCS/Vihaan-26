@@ -10,13 +10,12 @@ const url = (msg: string) => z.url(msg);
 
 export const adminLoginSchema = z.object({
     username: z.string().min(2, "Username must be at least 2 characters").max(100).trim(),
-    password: z.string().min(6, "Password must be at least 6 characters"),
+    password: z.string().min(6, "Password must be at least 6 characters").max(100),
 });
 
 export const adminRegisterSchema = z.object({
     username: z.string().min(2, "Username must be at least 2 characters").max(100).trim(),
-    email,
-    password: z.string().min(6, "Password must be at least 6 characters"),
+    password: z.string().min(6, "Password must be at least 6 characters").max(100),
     role: z.enum(["SUPER_ADMIN", "VOLUNTEER"]).default("VOLUNTEER"),
 });
 
@@ -24,7 +23,7 @@ export const adminRegisterSchema = z.object({
 
 export const userLoginSchema = z.object({
   email,
-  code: z.string().regex(/^\d{12}$/, "Code must be exactly 12 digits"),
+  code: z.string().regex(/^\d{16}$/, "Code must be exactly 16 digits"),
 });
 
 // ─── CSV Upload (single row parsed from CSV) ──────────────────────────────────
@@ -35,7 +34,6 @@ export const csvUserRowSchema = z.object({
     username: z.string().trim().min(1, "username is required"),
     email: z.email("Invalid email").trim().toLowerCase(),
     college_name: z.string().trim().min(1, "college_name is required"),
-    rsvp_code: z.string().regex(/^\d{6}$/, "RSVP code must be exactly 6 digits"),
     role: z.enum(["LEADER", "MEMBER"], { error: "role must be LEADER or MEMBER" }),
 });
 
@@ -64,7 +62,7 @@ export const assignRoomSchema = z.object({
 // ─── QR Assignment ────────────────────────────────────────────────────────────
 
 export const assignQrSchema = z.object({
-    rsvp_code: z.string().regex(/^\d{6}$/, "RSVP code must be exactly 6 digits"),
+    rsvp_code: z.string().regex(/^[A-Z0-9]{8}$/, "RSVP code must be exactly 8 digits"),
     qr_hash: z.string().trim().min(1, "qr_hash is required"),
 });
 

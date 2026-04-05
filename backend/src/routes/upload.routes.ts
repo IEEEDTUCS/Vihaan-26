@@ -17,7 +17,7 @@ const upload = multer({
 });
 
 // POST /api/upload/csv  — admin only
-router.post("/csv", adminAuth, upload.single("file"), handleCSVUpload);
+router.post("/csv", adminAuth, upload.single("file"), handleCSVUpload);//upload.single gives us the req.file or whatever name we choose
 
 export default router;
 

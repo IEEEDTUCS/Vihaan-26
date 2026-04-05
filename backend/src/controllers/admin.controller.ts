@@ -4,8 +4,30 @@ import { generateAdminToken } from "../utils/generateToken";
 import ExpressError from "../utils/expressError";
 
 
-//create admin 
+export const createAdmin = async (req: Request, res: Response) => {
+    const { username, password, role } = req.body;
+    const existingAdmin = await Admin.findOne({ name: username });
+    if(existingAdmin) {
+        throw new ExpressError(400, "Admin with this username already exists");
+    }
 
+    const newAdmin = new Admin({
+        name: username,
+        password,
+        role,
+    })
+
+    await newAdmin.save();
+
+    res.status(201).json({
+        success: true,
+        admin: {
+            id: newAdmin._id,
+            name: newAdmin.name,
+            role: newAdmin.role,
+        },
+    });
+}
 
 export const adminLogin = async (req: Request, res: Response) => {
     const { username, password } = req.body;
