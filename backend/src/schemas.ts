@@ -97,7 +97,7 @@ export const updateTeamSchema = z
 
 export const updateCheckpointStatusSchema = z.object({
     round_num: z.number().int().min(1).max(4),
-    status: z.enum(["PENDING", "VERIFIED", "SUSPICIOUS"]),
+    status: z.enum(["PENDING", "VERIFIED", "FLAGGED", "SUSPICIOUS"]),
 });
 
 // ─── Inferred Types ───────────────────────────────────────────────────────────
