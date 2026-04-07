@@ -8,7 +8,7 @@ export interface ICheckpoint {
     checkpoint_time: Date;
     submit_link: string | null;//can be repo link or image link
     submitted_at: Date | null;
-    status: "PENDING" | "VERIFIED" | "SUSPICIOUS";
+    status: "PENDING" | "VERIFIED" | "FLAGGED" | "SUSPICIOUS";
 }
 
 /**
@@ -59,7 +59,7 @@ const CheckpointSchema = new Schema<ICheckpoint>(
         },
         status: {
             type: String,
-            enum: ["PENDING", "VERIFIED", "SUSPICIOUS"],
+            enum: ["PENDING", "VERIFIED", "FLAGGED", "SUSPICIOUS"],
             default: "PENDING",
         },
     },
@@ -70,11 +70,10 @@ const CheckpointSchema = new Schema<ICheckpoint>(
  * Default 4 checkpoints with predecided times
  */
 const defaultCheckpoints = (): ICheckpoint[] => [//change times as per schedule
-    { round_num: 1, checkpoint_time: new Date("2026-04-04T21:00:00+05:30"), submit_link: null, submitted_at: null, status: "PENDING" },
-    { round_num: 2, checkpoint_time: new Date("2026-04-05T01:00:00+05:30"), submit_link: null, submitted_at: null, status: "PENDING" },
-    { round_num: 3, checkpoint_time: new Date("2026-04-05T05:00:00+05:30"), submit_link: null, submitted_at: null, status: "PENDING" },
-    { round_num: 4, checkpoint_time: new Date("2026-04-05T09:00:00+05:30"), submit_link: null, submitted_at: null, status: "PENDING" },
-];
+    { round_num: 1, checkpoint_time: new Date("2026-04-11T23:00:00+05:30"), submit_link: null, submitted_at: null, status: "PENDING" },
+    { round_num: 2, checkpoint_time: new Date("2026-04-12T01:00:00+05:30"), submit_link: null, submitted_at: null, status: "PENDING" },
+    { round_num: 3, checkpoint_time: new Date("2026-04-12T05:00:00+05:30"), submit_link: null, submitted_at: null, status: "PENDING" },
+    { round_num: 4, checkpoint_time: new Date("2026-04-12T09:00:00+05:30"), submit_link: null, submitted_at: null, status: "PENDING" },];
 
 /**
  * Team Schema
