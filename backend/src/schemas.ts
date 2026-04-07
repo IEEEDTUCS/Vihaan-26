@@ -22,8 +22,8 @@ export const adminRegisterSchema = z.object({
 // ─── User Login ───────────────────────────────────────────────────────────────
 
 export const userLoginSchema = z.object({
-  email,
-  code: z.string().regex(/^[A-Z0-9]{16}$/, "Code must be exactly 16 digits"),
+    email,
+    code: z.string().regex(/^[A-Z0-9]{16}$/, "Code must be exactly 16 digits"),
 });//password is 16 digits which can have numbers and capital letters, no special characters
 
 // ─── CSV Upload (single row parsed from CSV) ──────────────────────────────────

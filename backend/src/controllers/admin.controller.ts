@@ -7,7 +7,7 @@ import ExpressError from "../utils/expressError";
 export const createAdmin = async (req: Request, res: Response) => {
     const { username, password, role } = req.body;
     const existingAdmin = await Admin.findOne({ name: username });
-    if(existingAdmin) {
+    if (existingAdmin) {
         throw new ExpressError(400, "Admin with this username already exists");
     }
 
@@ -32,7 +32,7 @@ export const createAdmin = async (req: Request, res: Response) => {
 export const adminLogin = async (req: Request, res: Response) => {
     const { username, password } = req.body;
 
-    const admin = await Admin.findOne({ name : username });
+    const admin = await Admin.findOne({ name: username });
     if (!admin) throw new ExpressError(401, "Invalid credentials");
 
     const isMatch = await admin.comparePassword(password);
