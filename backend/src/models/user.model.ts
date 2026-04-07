@@ -30,7 +30,6 @@ const UserSchema = new Schema<IUser>(
         team_id: {
             type: String,
             required: true,
-            unique: true,
             index: true,
         },
 

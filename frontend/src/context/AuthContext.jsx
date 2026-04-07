@@ -128,6 +128,24 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const checkUserByQr = async (code) => {
+    const res = await fetch(`${backend_url}/scan/code` , {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: localStorage.getItem("authTokenAdmin"),
+      },
+      params: JSON.stringify({code}),
+    })
+
+    if(!res.ok){
+      throw new Error("User not found");
+    }
+    const data = await res.json();
+    return data;
+
+  }
+
   // The value object contains everything we want to make available to our app
   const value = {
     user,
@@ -135,8 +153,11 @@ export const AuthProvider = ({ children }) => {
     loading,
     login,
     logout,
+    checkUserByQr,
     isAuthenticated: !!user || !!admin,
   };
+
+
 
   return (
     <AuthContext.Provider value={value}>
@@ -153,3 +174,4 @@ export const useAuth = () => {
   }
   return context;
 };
+
