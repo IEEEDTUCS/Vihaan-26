@@ -40,6 +40,11 @@ const adminauth = () => {
         }
     };
 
+    // const handleTestMode = () => {
+    //     localStorage.setItem("ADMIN_TEST_MODE", "true");
+    //     navigate('/adminDashboard');
+    // };
+
     return (
         <div className="min-h-screen bg-slate-100 flex items-center justify-center px-4">
             <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
@@ -103,6 +108,17 @@ const adminauth = () => {
                         {loading ? 'Logging in...' : 'Log In'}
                     </button>
                 </form>
+
+                {/* Test Mode Button */}
+                {/* <div className="mt-6 text-center">
+                    <p className="text-xs text-slate-500 mb-3">For local testing:</p>
+                    <button
+                        onClick={handleTestMode}
+                        className="w-full rounded-lg bg-orange-500 px-4 py-2 font-medium text-white transition hover:bg-orange-600 text-sm"
+                    >
+                        🧪 Launch Demo Dashboard
+                    </button>
+                </div> */}
             </div>
         </div>
     );

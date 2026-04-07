@@ -2,6 +2,7 @@ import Home from "./pages/home.jsx";
 import AuthPage from "./pages/AuthPage.jsx";
 import AdminAuth from "./pages/adminauth.jsx";
 import UserDashboard from "./pages/UserDashboard.jsx";
+import SuperAdminDashboard from "./pages/SuperAdminDashboard.jsx";
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext.jsx";
@@ -16,6 +17,7 @@ function App() {
             <Route path="/login" element={<AuthPage />} />
             <Route path="/admin" element={<AdminAuth />} />
             <Route path="/userDashboard" element={<UserDashboard />} />
+            <Route path="/adminDashboard" element={<SuperAdminDashboard />} />
       </Routes>
       </AuthProvider>
      </Router>
