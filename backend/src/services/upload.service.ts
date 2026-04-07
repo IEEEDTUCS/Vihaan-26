@@ -107,7 +107,7 @@ export const uploadCSV = async (buffer: Buffer) => {
             }
 
             await User.create({
-                team_id: team._id,
+                team_id,
                 team_name,
                 username,
                 email,
