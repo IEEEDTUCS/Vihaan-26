@@ -12,12 +12,38 @@ const statusColors = {
 
 // ── TEAM DETAILS MODAL ────────────────────────────────────────────────────────
 export default function TeamDetailsModal({ team, onClose, onSave, token }) {
-  const [editedTeam, setEditedTeam] = useState(team || {});
+  const [editedTeam, setEditedTeam] = useState({
+  room_number: "",
+  ppt_link: "",
+  panel_number: "",
+  avg_points: 0,
+  stars: 0,
+  ...team //spreading existing team data over the defaults
+});
   const [activeCheckpoint, setActiveCheckpoint] = useState(null);
   const [saving, setSaving] = useState(false);
 
   const handleFieldChange = (field, value) => {
-    setEditedTeam((prev) => ({ ...prev, [field]: value }));
+    let validatedValue = value;
+
+    if (field === "stars") {
+      if (value === "") validatedValue = 0;
+      else validatedValue = Math.max(0, Math.min(5, parseInt(value, 10) || 0));
+    }
+    else if (field === "avg_points") {
+      if (value === "") validatedValue = 0; 
+      else validatedValue = Math.max(0, Math.min(100, parseFloat(value) || 0));
+    }
+    else {
+      validatedValue = value;
+    }
+
+    // console.log(`Updating ${field} to:`, validatedValue)
+
+    setEditedTeam((prev) => ({
+      ...prev,
+      [field]: validatedValue
+    }));
   };
 
   const handleCheckpointStatusChange = (roundNum, newStatus) => {
@@ -32,6 +58,7 @@ export default function TeamDetailsModal({ team, onClose, onSave, token }) {
   const handleSave = async () => {
     setSaving(true);
     try {
+      // console.log("Saving team data:", editedTeam);
       await onSave(editedTeam, token);
       onClose();
     } finally {
@@ -126,13 +153,14 @@ export default function TeamDetailsModal({ team, onClose, onSave, token }) {
                 </label>
                 <input
                   type={["avg_points", "stars"].includes(field) ? "number" : "text"}
-                  value={editedTeam[field] || ""}
+                  value={editedTeam[field] ?? ""} // Use nullish coalescing
                   onChange={(e) => handleFieldChange(field, e.target.value)}
                   readOnly={readonly}
                   style={{
                     ...inputStyle,
                     background: readonly ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.05)",
                     color: readonly ? "#666" : "#fff",
+                    pointerEvents: readonly ? "none" : "auto", // Added to ensure no interaction on readonly
                     cursor: readonly ? "not-allowed" : "text",
                   }}
                 />
@@ -190,14 +218,19 @@ export default function TeamDetailsModal({ team, onClose, onSave, token }) {
                   Round {cp.round_num}
                 </span>
                 <span style={{ fontFamily: "Edu TAS Beginner, sans-serif", fontSize: "0.75rem", color: "#888" }}>
-                  {new Date(cp.checkpoint_time).toLocaleString("en-IN", {
-                    timeZone: "Asia/Kolkata",
-                    hour12: true,
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    day: "2-digit",
-                    month: "short",
-                  })}
+                  {cp.checkpoint_time ? (
+                    new Date(cp.checkpoint_time).toLocaleString("en-IN", {
+                      timeZone: "Asia/Kolkata",
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: true,
+                    })
+                  ) : (
+                    "No Date Provided"
+                  )}
                 </span>
               </div>
               {cp.submit_link && (

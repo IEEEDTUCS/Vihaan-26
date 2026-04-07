@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 
 const AuthContext = createContext(null);
-const backend_url = import.meta.env.VITE_BACKEND_URL_VIHAAN;
+const BACKEND = import.meta.env.VITE_BACKEND_URL_VIHAAN || "http://localhost:3000";
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const fetchMe = async (token) => {
-    const res = await fetch(`${backend_url}/api/user/me`, {
+    const res = await fetch(`${BACKEND}/api/user/me`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -66,14 +66,16 @@ export const AuthProvider = ({ children }) => {
   };
 
   const fetchMeAdmin = async (token) => {
-    const res = await fetch(`${backend_url}/api/admin/me`, {
-      method: "POST",
+    // console.log("Fetching admin details with token:", token);
+    const res = await fetch(`${BACKEND}/api/admin/me`, {
+      method: "GET",          //******************************** GET as per admin route, POST incorrectly handles the req 
       headers: {
         "Content-Type": "application/json",
-        authorization: token,
+        "Authorization": `Bearer ${token}`,
       },
     });
-
+    
+    console.log(res);
     const data = await res.json().catch(() => ({}));
 
     if (!res.ok) {
@@ -91,7 +93,7 @@ export const AuthProvider = ({ children }) => {
       : { email: identifier, code: password };
 
   
-      const res = await fetch(`${backend_url}${endpoint}`, {
+      const res = await fetch(`${BACKEND}${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

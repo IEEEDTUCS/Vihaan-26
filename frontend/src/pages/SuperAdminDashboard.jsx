@@ -3,11 +3,12 @@ import { motion } from "framer-motion";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
 import ComicAlert from "../utils/ComicAlert.jsx";
-import mockData from "./mockData.json";
 
 //-------------------------*************----****--------------
 //PLZ DONT FORGET TO UPDATE API ENDPOIINTS IN THIS FILE WHEN REAL BACKEND FUNCTIONALITIES USED HERE ARE READY
 //-------------------------*************----****--------------
+
+//----ENDPOINTS HAVE BEEN UPDATED
 
 // Import Refactored Sections
 import UsersSection from "../utils/Admin/UsersSection";
@@ -25,152 +26,108 @@ export default function SuperAdminDashboard() {
   const [loading, setLoading] = useState(false);
   const [alerts, setAlerts] = useState([]);
 
-  const token = localStorage.getItem("authTokenAdmin") || "DEMO_TOKEN";
-  const isTestMode = localStorage.getItem("ADMIN_TEST_MODE") === "true";
-  const displayAdmin = admin || (isTestMode ? { id: "debug", name: "Test Admin", role: "SUPER_ADMIN" } : null);
-
-  // Mock data for development/testing
-  // const mockUsers = [
-  //   { _id: "1", username: "alice_dev", team_name: "Team Alpha", role: "LEADER", college_name: "DTU", email: "alice@dtu.ac.in", rsvp_code: "RSVP001", is_present: true, room_allot: "101", food_count: 2, bedsheet_taken: true },
-  //   { _id: "2", username: "bob_code", team_name: "Team Alpha", role: "MEMBER", college_name: "BITS", email: "bob@bits.ac.in", rsvp_code: "RSVP002", is_present: true, room_allot: "101", food_count: 1, bedsheet_taken: false },
-  //   { _id: "3", username: "charlie_dev", team_name: "Team Beta", role: "LEADER", college_name: "IIT Delhi", email: "charlie@iit.ac.in", rsvp_code: "RSVP003", is_present: false, room_allot: null, food_count: 0, bedsheet_taken: false },
-  //   { _id: "4", username: "diana_hack", team_name: "Team Beta", role: "MEMBER", college_name: "VIT", email: "diana@vit.ac.in", rsvp_code: "RSVP004", is_present: true, room_allot: "102", food_count: 2, bedsheet_taken: true },
-  //   { _id: "5", username: "evan_code", team_name: "Team Gamma", role: "LEADER", college_name: "DTU", email: "evan@dtu.ac.in", rsvp_code: "RSVP005", is_present: true, room_allot: "103", food_count: 1, bedsheet_taken: true },
-  // ];
-
-  // const mockTeams = [
-  //   { team_id: "T001", team_name: "Team Alpha", type: "SOFTWARE", category: ["FinTech", "AI"], description: "Financial AI Platform", repo_or_image_link: "https://github.com/team-alpha/repo", room_number: "101", panel_number: "P1", avg_points: 85, stars: 4, checkpoints: [
-  //     { round_num: 1, checkpoint_time: new Date("2026-04-11T23:00:00"), submit_link: "https://github.com/team-alpha/commit/abc123", submitted_at: new Date("2026-04-11T23:15:00"), status: "VERIFIED" },
-  //     { round_num: 2, checkpoint_time: new Date("2026-04-12T01:00:00"), submit_link: "https://github.com/team-alpha/commit/def456", submitted_at: new Date("2026-04-12T01:10:00"), status: "VERIFIED" },
-  //     { round_num: 3, checkpoint_time: new Date("2026-04-12T05:00:00"), submit_link: null, submitted_at: null, status: "PENDING" },
-  //     { round_num: 4, checkpoint_time: new Date("2026-04-12T09:00:00"), submit_link: null, submitted_at: null, status: "PENDING" },
-  //   ]},
-  //   { team_id: "T002", team_name: "Team Beta", type: "HARDWARE", category: ["IoT"], description: "Smart Home System", repo_or_image_link: "https://example.com/hardware.jpg", room_number: "102", panel_number: "P2", avg_points: 92, stars: 5, checkpoints: [
-  //     { round_num: 1, checkpoint_time: new Date("2026-04-11T23:00:00"), submit_link: "https://example.com/image1.jpg", submitted_at: new Date("2026-04-11T23:20:00"), status: "VERIFIED" },
-  //     { round_num: 2, checkpoint_time: new Date("2026-04-12T01:00:00"), submit_link: null, submitted_at: null, status: "PENDING" },
-  //     { round_num: 3, checkpoint_time: new Date("2026-04-12T05:00:00"), submit_link: null, submitted_at: null, status: "PENDING" },
-  //     { round_num: 4, checkpoint_time: new Date("2026-04-12T09:00:00"), submit_link: null, submitted_at: null, status: "PENDING" },
-  //   ]},
-  //   { team_id: "T003", team_name: "Team Gamma", type: "FRESHERS", category: ["WebDev"], description: "E-commerce Platform", repo_or_image_link: "https://github.com/team-gamma/repo", room_number: "103", panel_number: "P1", avg_points: 78, stars: 3, checkpoints: [
-  //     { round_num: 1, checkpoint_time: new Date("2026-04-11T23:00:00"), submit_link: null, submitted_at: null, status: "PENDING" },
-  //     { round_num: 2, checkpoint_time: new Date("2026-04-12T01:00:00"), submit_link: null, submitted_at: null, status: "PENDING" },
-  //     { round_num: 3, checkpoint_time: new Date("2026-04-12T05:00:00"), submit_link: null, submitted_at: null, status: "PENDING" },
-  //     { round_num: 4, checkpoint_time: new Date("2026-04-12T09:00:00"), submit_link: null, submitted_at: null, status: "PENDING" },
-  //   ]},
-  // ];
-
-  // ── TEMPORARY: Using mock data from mockData.json for local testing ──
-  // TO DELETE: Remove these lines when switching back to actual API calls
-  const usersData = mockData.users;
-  const teamsData = mockData.teams;
+  const token = localStorage.getItem("authTokenAdmin");
+  const displayAdmin = admin;
 
   // Fetch all users
   const fetchUsers = useCallback(async () => {
 
-    // ── ACTUAL CODE (COMMENTED OUT FOR LOCAL TESTING) ──
+    try {
+      const res = await fetch(`${BACKEND}/api/admin/users`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to fetch users");
+      setAllUsers(data.users || []);
+    } catch (err) {
+      setAlerts([{ message: err.message, severity: 2 }]);
+    }
 
-    // try {
-    //   const res = await fetch(`${BACKEND}/api/admin/users`, {
-    //     headers: { Authorization: `Bearer ${token}` },
-    //   });
-    //   const data = await res.json();
-    //   if (!res.ok) throw new Error(data.error || "Failed to fetch users");
-    //   setAllUsers(data.users || []);
-    // } catch (err) {
-    //   // Fallback to mock data
-    //   console.log("Using mock user data for testing");
-    //   setAllUsers(mockUsers);
-    // }
-
-    // ── DUMMY CODE FOR LOCAL TESTING ──
-
-    console.log("Fetching users from mockData.json");
-    setAllUsers(usersData);
-  }, [usersData]);
+  }, [token]);
 
   // Fetch all teams
   const fetchTeams = useCallback(async () => {
-
-    // ── ACTUAL CODE (COMMENTED OUT FOR LOCAL TESTING) ──
     
-    // try {
-    //   const res = await fetch(`${BACKEND}/api/admin/teams`, {
-    //     headers: { Authorization: `Bearer ${token}` },
-    //   });
-    //   const data = await res.json();
-    //   if (!res.ok) throw new Error(data.error || "Failed to fetch teams");
-    //   setAllTeams(data.teams || []);
-    // } catch (err) {
-    //   // Use mock data for development
-    //   console.log("Using mock team data for testing");
-    //   setAllTeams(mockTeams);
-    // }
+    try {
+      const res = await fetch(`${BACKEND}/api/admin/teams`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to fetch teams");
+      setAllTeams(data.teams || []);
+    } catch (err) {
+      setAlerts([{ message: err.message, severity: 2 }]);
+    }
 
-    // ── DUMMY CODE FOR LOCAL TESTING ──
-    console.log("Fetching teams from mockData.json");
-    setAllTeams(teamsData);
-  }, [teamsData]);
+  }, [token]);
 
   // Load data on mount
   useEffect(() => {
-    if (!authLoading && !admin && !isTestMode) {
-      navigate("/login");
+    if (!authLoading && admin === null) {
+      navigate("/admin");
     }
-  }, [authLoading, admin, navigate, isTestMode]);
+  }, [authLoading, admin, navigate]);
 
   useEffect(() => {
-    if ((admin || isTestMode) && token) {
+    if (admin && token) {
       setLoading(true);
       Promise.all([fetchUsers(), fetchTeams()]).finally(() => setLoading(false));
     }
-  }, [admin, token, fetchUsers, fetchTeams, isTestMode]);
+  }, [admin, token, fetchUsers, fetchTeams]);
 
   // Save team changes
   const handleSaveTeam = async (editedTeam, token) => {
-    // ── ACTUAL CODE (COMMENTED OUT FOR LOCAL TESTING) ──
-    // try {
-    //   const res = await fetch(`${BACKEND}/api/admin/teams/${editedTeam.team_id}`, {
+    console.log("Saving team data:", editedTeam);
 
-    //     method: "PUT",    //---------------------------------assuming the API uses PUT for updates; change to PATCH if needed
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //       Authorization: `Bearer ${token}`,
-    //     },
-    //     body: JSON.stringify({
-    //       panel_number: editedTeam.panel_number,
-    //       avg_points: editedTeam.avg_points,
-    //       stars: editedTeam.stars,
-    //       checkpoints: editedTeam.checkpoints,
-    //     }),
-    //   });
-    //   const data = await res.json();
-    //   if (!res.ok) throw new Error(data.error || "Failed to save team");
-    //   setAlerts([
-    //     {
-    //       message: "Team updated successfully",
-    //       severity: 0,
-    //     },
-    //   ]);
-    //   fetchTeams();
-    // } catch (err) {
-    //   setAlerts([{ message: err.message, severity: 2 }]);
-    // }
+    try {
+      const updateDetailsReq = fetch(`${BACKEND}/api/admin/team/${editedTeam.team_id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          room_number: editedTeam.room_number,
+          ppt_link: editedTeam.ppt_link,
+          panel_number: editedTeam.panel_number,
+          avg_points: editedTeam.avg_points,
+          stars: editedTeam.stars,
+        }),
+      });
 
-    // ── DUMMY CODE FOR LOCAL TESTING ──
-    console.log("Saving team data to mock storage (not persisted):", editedTeam);
-    setAlerts([
-      {
-        message: "✅ Team data saved locally (demo mode - changes not persisted)",
-        severity: 0,
-      },
-    ]);
-    //in real scenario, fetchTeams() would be called here to refresh data
+      const checkpointReqs = editedTeam.checkpoints.map((cp) =>
+        fetch(`${BACKEND}/api/admin/team/${editedTeam.team_id}/checkpoint`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            round_num: cp.round_num,
+            status: cp.status,
+          }),
+        })
+      );
+
+      const allResponses = await Promise.all([updateDetailsReq, ...checkpointReqs]);
+
+      for (const res of allResponses) {
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.error || "Update failed");
+        }
+      }
+
+      setAlerts([{ message: "Team & Checkpoints updated successfully! 🎯", severity: 0 }]);
+      fetchTeams();
+    } catch (err) {
+      setAlerts([{ message: err.message, severity: 2 }]);
+    }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("ADMIN_TEST_MODE");
     logout();
-    navigate("/login");
+    navigate("/admin");
   };
 
   if (authLoading) {
@@ -287,18 +244,6 @@ export default function SuperAdminDashboard() {
                 cursor: "pointer",
                 transition: "all 0.2s",
               }}
-              onMouseEnter={(e) => {
-                if (activeSection !== section) {
-                  e.currentTarget.style.borderColor = "#9CA802";
-                  e.currentTarget.style.color = "#9CA802";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (activeSection !== section) {
-                  e.currentTarget.style.borderColor = "#444";
-                  e.currentTarget.style.color = "#aaa";
-                }
-              }}
             >
               {section === "teams" ? "🎯 Teams" : "👥 Users"}
             </button>
@@ -320,8 +265,6 @@ export default function SuperAdminDashboard() {
               cursor: "pointer",
               transition: "all 0.2s",
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,68,68,0.1)")}
-            onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
           >
             Logout
           </button>
