@@ -19,7 +19,6 @@
     height: 90%;
     transform: translateX(-50%);
     content: '';
-    background-image: url(/Track/model.png); /* Ensure this path is correct in your public folder */
     background-size: 35rem;
     background-repeat: no-repeat;
     background-position: bottom;
@@ -151,7 +150,7 @@
 
 
 .banner .content .model {
-    background-image: url(/images/model.png); /* Ensure this path is correct */
+    background-image: url(/Track/model.webp); /* Ensure this path is correct */
     width: 100%;
     height: 75vh;
     position: absolute;

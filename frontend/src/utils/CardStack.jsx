@@ -12,7 +12,7 @@ export default function CardStack() {
     >
       {/* CARD 1 — LEFT */}
       <motion.img
-        src="/cards1.svg"
+        src="/Gallerysvgs/c1-1.webp"
         alt="cards1"
         initial={{
           opacity: 0,
@@ -46,7 +46,7 @@ export default function CardStack() {
 
       {/* CARD 2 — MIDDLE (MAIN) */}
       <motion.img
-        src="/cards2.svg"
+        src="/Gallerysvgs/c12-1.webp"
         alt="cards2"
         initial={{
           opacity: 0,
@@ -83,7 +83,7 @@ export default function CardStack() {
 
       {/* CARD 3 — RIGHT */}
       <motion.img
-        src="/cards3.svg"
+        src="/Gallerysvgs/c14-1.webp"
         alt="cards3"
         initial={{
           opacity: 0,

@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "ES6",
+    "esModuleInterop": true,
+    "verbatimModuleSyntax": false,
+    "rootDir": "./src",
+    "outDir": "./dist"
+  }
+}

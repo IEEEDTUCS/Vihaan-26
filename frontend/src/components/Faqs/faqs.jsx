@@ -1,18 +1,32 @@
+import { useState } from 'react';
+import { motion } from 'framer-motion';
 import Accordion from './Accordion.jsx';
 import FAQHelper from './FAQHelper';
 
 export default function Faqs() {
+  const [openIndex, setOpenIndex] = useState(null);
+
+  const handleToggle = (index) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
+
   return (
     <>
-      <section className="relative h-full overflow-hidden  w-full " style={{ paddingTop: '1.5rem', paddingBottom: '8rem', }}>
+      <section className="relative h-full overflow-hidden mt-1 w-full " style={{ paddingTop: '1.5rem', paddingBottom: '8rem', }}>
         <div style={{ position: 'absolute', top: '-10vh', left: '-20vw', width: '50vw', height: '50vh', backgroundImage: 'url(/Faqs/SpotPattern.svg)', backgroundRepeat: 'no-repeat', backgroundSize: '75vw 75vh', backgroundPosition: '-10vw -25vh' }}></div>
         <div style={{ position: 'absolute', top: '-10vh', right: '-20vw', width: '50vw', height: '50vh', backgroundImage: 'url(/Faqs/SpotPattern.svg)', backgroundRepeat: 'no-repeat', backgroundSize: '50vw 75vh', backgroundPosition: '0 -25vh' }}></div>
         <div style={{ position: 'absolute', bottom: '-10vh', left: '-20vw', width: '50vw', height: '50vh', backgroundImage: 'url(/Faqs/SpotPattern.svg)', backgroundRepeat: 'no-repeat', backgroundSize: '50vw 75vh', }}></div>
         <div style={{ position: 'absolute', bottom: '-10vh', right: '-20vw', width: '50vw', height: '50vh', backgroundImage: 'url(/Faqs/SpotPattern.svg)', backgroundRepeat: 'no-repeat', backgroundSize: '50vw 75vh', }}></div>
         <div style={{zIndex: '0'}}>
-          <div className="flex justify-center items-center">
+          <motion.div 
+            className="flex justify-center items-center"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+          >
             <h1
-              className="heading mt-16 text-center break-words lg:whitespace-nowrap"
+              className="heading mt-16 text-center wrap-break-words lg:whitespace-nowrap"
               style={{
               position: 'relative',
               fontSize: "clamp(48px, 8vw, 112px)",
@@ -43,26 +57,31 @@ export default function Faqs() {
                   pointerEvents: 'none',
                 }}
               ></span>
-
                 ASKED
               </span>
-
               &nbsp;QUESTIONS?!
             </h1>
-          </div>
+          </motion.div>
   
-          <div
-            style={{
-              
-              marginTop: '5rem',
-              height: '100vh'
-            }}>
-         
+          <motion.div 
+            style={{ marginTop: '5rem' }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true, amount: 0.1 }}
+            transition={{ duration: 0.3 }}
+          >
             <div className="faq-accordions" >
               { FAQHelper && FAQHelper.faqs.map((faq, index) => (
-                <Accordion key={index} QAPair={faq}/> ))}
+                <Accordion 
+                  key={index} 
+                  QAPair={faq}
+                  isOpen={openIndex === index}
+                  onToggle={() => handleToggle(index)}
+                  index={index}
+                /> 
+              ))}
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
     </>

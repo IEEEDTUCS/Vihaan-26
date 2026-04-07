@@ -1,11 +1,11 @@
 import styles from './button.module.css';
 
-export default function button({text}) {
+export default function button({text , link}) {
   return (
-     <div class={styles.centre}>
-      <button type="button" className={styles.commonbutton}>
-        <div class={styles.top}>{text}</div>
-        <div class={styles.bottom}></div>
+     <div className={styles.centre}>
+      <button type="button" className={styles.commonbutton} onClick={() => window.open(link, '_blank')}>
+        <div className={styles.top}>{text}</div>
+        <div className={styles.bottom}></div>
       </button>
     </div>
   )

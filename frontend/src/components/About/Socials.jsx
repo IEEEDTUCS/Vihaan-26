@@ -30,7 +30,7 @@ export default function Socials() {
 
   {/* INSTAGRAM */}
   <a
-    href="https://www.instagram.com/ieee.dtu"
+    href="https://www.instagram.com/vihaan_dtu/"
     target="_blank"
     rel="noopener noreferrer"
     className="relative group"
