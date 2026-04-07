@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { 
+    createAdmin,
     adminLogin, 
     adminMe, 
     getAllUsers, 
@@ -7,14 +8,17 @@ import {
     updateTeamDetails, 
     updateCheckpoint 
 } from "../controllers/admin.controller";
-import { adminAuth, superAdminOnly } from "../middlewares/adminAuth";
+import { adminAuth, createCheck, superAdminOnly } from "../middlewares/adminAuth";
 import { validate } from "../middlewares/validate";
-import { adminLoginSchema } from "../schemas";
+import { adminLoginSchema, adminRegisterSchema } from "../schemas";
 import { wrapAsync } from "../utils/wrapAsync";
 
 const router = Router();
 
 // --- Auth Routes ---
+
+//create admin 
+router.post("/create", createCheck, validate(adminRegisterSchema), wrapAsync(createAdmin));
 
 // POST /api/admin/login
 router.post("/login", validate(adminLoginSchema), wrapAsync(adminLogin));
