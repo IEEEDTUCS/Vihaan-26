@@ -10,6 +10,21 @@ export default function UsersSection({ allUsers, loading }) {
   const [page, setPage] = useState(1);
   const itemsPerPage = 15;
 
+
+  const thStyle = {
+    padding: "12px",
+    textAlign: "left",
+    color: "#9CA802",
+    fontSize: "0.9rem",
+    fontWeight: 600,
+  };
+
+  const tdStyle = {
+    padding: "10px 12px",
+    color: "#ccc",
+    fontSize: "0.85rem",
+  };
+
   // ── CLEAR FILTERS LOGIC ─────────────────────────────────────────────────────
   const clearFilters = () => {
     setSearchTerm("");
@@ -146,36 +161,20 @@ export default function UsersSection({ allUsers, loading }) {
             >
               <thead>
                 <tr style={{ borderBottom: "2px solid #444", backgroundColor: "rgba(156,168,2,0.08)" }}>
-                  <th style={{ padding: "12px", textAlign: "left", color: "#9CA802", fontSize: "0.9rem", fontWeight: 600 }}>
-                    Username
-                  </th>
-                  <th style={{ padding: "12px", textAlign: "left", color: "#9CA802", fontSize: "0.9rem", fontWeight: 600 }}>
-                    Team
-                  </th>
-                  <th style={{ padding: "12px", textAlign: "left", color: "#9CA802", fontSize: "0.9rem", fontWeight: 600 }}>
-                    Role
-                  </th>
-                  <th style={{ padding: "12px", textAlign: "left", color: "#9CA802", fontSize: "0.9rem", fontWeight: 600 }}>
-                    College
-                  </th>
-                  <th style={{ padding: "12px", textAlign: "left", color: "#9CA802", fontSize: "0.9rem", fontWeight: 600 }}>
-                    Email
-                  </th>
-                  <th style={{ padding: "12px", textAlign: "left", color: "#9CA802", fontSize: "0.9rem", fontWeight: 600 }}>
-                    RSVP
-                  </th>
-                  <th style={{ padding: "12px", textAlign: "left", color: "#9CA802", fontSize: "0.9rem", fontWeight: 600 }}>
-                    Present
-                  </th>
-                  <th style={{ padding: "12px", textAlign: "left", color: "#9CA802", fontSize: "0.9rem", fontWeight: 600 }}>
-                    Room
-                  </th>
-                  <th style={{ padding: "12px", textAlign: "left", color: "#9CA802", fontSize: "0.9rem", fontWeight: 600 }}>
-                    Food
-                  </th>
-                  <th style={{ padding: "12px", textAlign: "left", color: "#9CA802", fontSize: "0.9rem", fontWeight: 600 }}>
-                    Bedsheet
-                  </th>
+                  <th style={thStyle}> Username </th>
+                  <th style={thStyle}> Team </th>
+                  <th style={thStyle}> Team ID </th>
+                  <th style={thStyle}> Role </th>
+                  <th style={thStyle}> College </th>
+                  <th style={thStyle}> Email </th>
+                  <th style={thStyle}> RSVP </th>
+                  <th style={thStyle}> Present </th>
+                  <th style={thStyle}> Room </th>
+                  <th style={thStyle}> Food </th>
+                  <th style={thStyle}> Bedsheet </th>
+                  <th style={thStyle}> QR Hash </th>
+                  <th style={thStyle}> Created At </th>
+                  <th style={thStyle}> Updated At </th>
                 </tr>
               </thead>
               <tbody>
@@ -187,44 +186,36 @@ export default function UsersSection({ allUsers, loading }) {
                       backgroundColor: idx % 2 === 0 ? "rgba(47, 47, 47, 0.7)" : "rgb(0, 0, 0, 0.7)",
                     }}
                   >
-                    <td style={{ padding: "10px 12px", color: "#fff", fontSize: "0.85rem" }}>
-                      {user.username}
-                    </td>
-                    <td style={{ padding: "10px 12px", color: "#ccc", fontSize: "0.85rem" }}>
-                      {user.team_name || "—"}
-                    </td>
-                    <td style={{ padding: "10px 12px", fontSize: "0.85rem" }}>
-                      <span
-                        style={{
-                          color: user.role === "LEADER" ? "#bba75d" : "#888",
-                          fontWeight: 600,
-                        }}
-                      >
+                    <td style={tdStyle}>{user.username}</td>
+                    <td style={tdStyle}>{user.team_name || "—"}</td>
+                    <td style={tdStyle}>{user.team_id}</td>
+
+                    <td style={tdStyle}>
+                      <span style={{ color: user.role === "LEADER" ? "#bba75d" : "#888", fontWeight: 600 }}>
                         {user.role}
                       </span>
                     </td>
-                    <td style={{ padding: "10px 12px", color: "#888", fontSize: "0.85rem" }}>
-                      {user.college_name || "—"}
-                    </td>
-                    <td style={{ padding: "10px 12px", color: "#888", fontSize: "0.85rem" }}>
-                      {user.email}
-                    </td>
-                    <td style={{ padding: "10px 12px", color: "#888", fontSize: "0.85rem" }}>
-                      {user.rsvp_code || "—"}
-                    </td>
-                    <td style={{ padding: "10px 12px", fontSize: "0.85rem" }}>
+
+                    <td style={tdStyle}>{user.college_name || "—"}</td>
+                    <td style={tdStyle}>{user.email}</td>
+                    <td style={tdStyle}>{user.rsvp_code || "—"}</td>
+
+                    <td style={tdStyle}>
                       <span style={{ color: user.is_present ? "#9CA802" : "#ff4444", fontWeight: 600 }}>
                         {user.is_present ? "✓" : "✗"}
                       </span>
                     </td>
-                    <td style={{ padding: "10px 12px", color: "#888", fontSize: "0.85rem" }}>
-                      {user.room_allot || "—"}
+
+                    <td style={tdStyle}>{user.room_allot || "—"}</td>
+                    <td style={tdStyle}>{user.food_count ?? "—"}</td>
+                    <td style={tdStyle}>{user.bedsheet_taken ? "✓" : "✗"}</td>
+
+                    <td style={tdStyle}>{user.qr_hash || "—"}</td>
+                    <td style={tdStyle}>
+                      {user.createdAt ? new Date(user.createdAt).toLocaleString() : "—"}
                     </td>
-                    <td style={{ padding: "10px 12px", color: "#888", fontSize: "0.85rem" }}>
-                      {user.food_count ?? "—"}
-                    </td>
-                    <td style={{ padding: "10px 12px", color: "#888", fontSize: "0.85rem" }}>
-                      {user.bedsheet_taken ? "✓" : "✗"}
+                    <td style={tdStyle}>
+                      {user.updatedAt ? new Date(user.updatedAt).toLocaleString() : "—"}
                     </td>
                   </tr>
                 ))}
