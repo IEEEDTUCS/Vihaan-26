@@ -10,7 +10,6 @@ import {
 } from "../controllers/user.controller";
 import { submitInitial, submitCheckpoint } from "../controllers/submission.controller";
 import { userAuth, leaderOnly } from "../middlewares/userAuth";
-import { leaderOnly } from "../middlewares/userAuth";
 import { validate } from "../middlewares/validate";
 import { userLoginSchema, submitRepoSchema, submitCheckpointSchema } from "../schemas";
 import { wrapAsync } from "../utils/wrapAsync";
