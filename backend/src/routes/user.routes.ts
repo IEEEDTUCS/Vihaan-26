@@ -5,11 +5,11 @@ import {
     markUserPresent,
     userLogin,
     userMe,
-    userVolunteerUpdatePayload
+    userVolunteerUpdatePayload,
+    teamLeaderProjectSubmission
 } from "../controllers/user.controller";
 import { submitInitial, submitCheckpoint } from "../controllers/submission.controller";
-import { userAuth } from "../middlewares/userAuth";
-import { leaderOnly } from "../middlewares/userAuth";
+import { userAuth, leaderOnly } from "../middlewares/userAuth";
 import { validate } from "../middlewares/validate";
 import { userLoginSchema, submitRepoSchema, submitCheckpointSchema } from "../schemas";
 import { wrapAsync } from "../utils/wrapAsync";
@@ -32,5 +32,7 @@ router.get("/scan/:qrHash", adminAuth, wrapAsync(findUserByQrCode));
 router.post("/linkQr", adminAuth, wrapAsync(linkUserToQrCode));
 router.post("/scan/:qrHash/present", adminAuth, wrapAsync(markUserPresent));
 router.put("/scan/:qrHash/update", adminAuth, wrapAsync(userVolunteerUpdatePayload));
+
+router.put("/submitLink", userAuth, leaderOnly, wrapAsync(teamLeaderProjectSubmission));
 
 export default router;

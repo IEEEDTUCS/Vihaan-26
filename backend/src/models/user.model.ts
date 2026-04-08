@@ -11,7 +11,6 @@ export interface IUser extends Document {
     email: string;
     college_name: string;
     role: "LEADER" | "MEMBER";
-
     qr_hash?: string | null;
     is_present: boolean;
     food_count: number;
@@ -30,7 +29,6 @@ const UserSchema = new Schema<IUser>(
         team_id: {
             type: String,
             required: true,
-            unique: true,
             index: true,
         },
 
