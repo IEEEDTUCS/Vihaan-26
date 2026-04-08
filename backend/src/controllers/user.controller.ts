@@ -4,8 +4,6 @@ import { Team } from "../models/team.model";
 import { Room } from "../models/room.model";
 import { generateUserToken } from "../utils/generateToken";
 import ExpressError from "../utils/expressError";
-import {updateTeamSchema} from "../schemas";
-import {gt} from "zod";
 
 export const userLogin = async (req: Request, res: Response) => {
     const { email, code } = req.body;

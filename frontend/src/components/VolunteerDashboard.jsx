@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import QrScanner from 'qr-scanner';
-import { useAuth } from "../context/AuthContext"; 
+import { useAuth } from "../context/AuthContext";
+import {useNavigate} from "react-router-dom";
 // const backend_url = import.meta.env.VITE_BACKEND_URL_VIHAAN;
 
 export default function VolunteerDashboard() {
   /* State */
   const scannerRef = useRef(null);
-    const { checkUserByQr, linkUserQr, markUserPresent, updateUserFoodCount, updateUserBeddingTaken } = useAuth();
+  const { admin, isAuthenticated, checkUserByQr, linkUserQr, markUserPresent, updateUserFoodCount, updateUserBeddingTaken } = useAuth();
 
   const [qrCode, setQrCode] = useState("");
   const [isScanning, setIsScanning] = useState(false);
@@ -21,6 +22,14 @@ export default function VolunteerDashboard() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+      if (!isAuthenticated) {
+          navigate("/volunteer-login");
+      }
+  }, [isAuthenticated, navigate])
 
   /* Scanner Setup */
 useEffect(() => {
