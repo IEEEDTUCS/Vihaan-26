@@ -3,6 +3,7 @@ import { User } from "../models/user.model";
 import { Team } from "../models/team.model";
 import { generateUserToken } from "../utils/generateToken";
 import ExpressError from "../utils/expressError";
+import {updateTeamSchema} from "../schemas";
 
 export const userLogin = async (req: Request, res: Response) => {
     const { email, code } = req.body;
@@ -57,6 +58,29 @@ export const userMe = async (req: Request, res: Response) => {
     });
 };
 
+type Room = {
+    roomNo: string;
+    availability: number;
+}
+
+function allotRoom(teamSize: number, rooms: Room[]) {
+    let bestfitroom= null;
+    let bestfitindex=-1;
+
+    for(let i=0; i<rooms.length; i++) {
+        if(rooms[i].availability>=teamSize){
+            if(bestfitroom=== null || rooms[i].availability>bestfitroom.availability ){
+                bestfitroom=rooms[i];
+                bestfitindex=i;
+            }
+        }
+    }
+    //if(bestfitindex===-1){
+      //  return no empty room available
+    //}
+    rooms[bestfitindex].availability -=teamSize;
+    //return the alloted room no.
+}
 
 export const findUserByQrCode = async (req: Request, res: Response) => {
     const {qrHash} = req.params;
