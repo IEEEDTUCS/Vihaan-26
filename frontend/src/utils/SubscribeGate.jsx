@@ -4,7 +4,7 @@ import PWAInstallPrompt from "./PWAInstallPrompt.jsx";
 
 export default function SubscribeGate({ setNotifCookie, onContinue }) {
   const PUBLIC_VAPID_KEY = import.meta.env.VITE_PUBLIC_VAPID_KEY;
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL_VIHAAN || "http://localhost:3000";
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
   const [loading, setLoading] = useState(false);
 
