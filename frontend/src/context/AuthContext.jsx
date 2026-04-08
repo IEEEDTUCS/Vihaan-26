@@ -145,6 +145,20 @@ export const AuthProvider = ({ children }) => {
     return data;
 
   }
+ const linkUserQr = async (qrHash, rsvpCode) => {
+    try {
+      // MATCHES: router.post("/linkQr")
+      const res = await axios.post(
+        `${backend_url}/api/user/linkQr`,
+        { qrHash, rsvpCode }, 
+        { headers: { authorization: localStorage.getItem("authTokenAdmin") } }
+      );
+      return res.data;
+    } catch (error) {
+      const backendMessage = error.response?.data?.message || error.response?.data?.error;
+      throw new Error(backendMessage || "Invalid RSVP Code.");
+    }
+  };
 
   // The value object contains everything we want to make available to our app
   const value = {
@@ -154,6 +168,7 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     checkUserByQr,
+    linkUserQr,
     isAuthenticated: !!user || !!admin,
   };
 

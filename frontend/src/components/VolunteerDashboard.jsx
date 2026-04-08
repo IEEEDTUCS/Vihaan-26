@@ -1,16 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import QrScanner from 'qr-scanner';
-import { useAuth } from "../context/AuthContext";
-
-// Ensure this is defined or imported from your config
-const API = "https://your-api-url.com/api"; 
+import { useAuth } from "../context/AuthContext"; 
+const backend_url = import.meta.env.VITE_BACKEND_URL_VIHAAN;
 
 export default function VolunteerDashboard() {
   /* State */
   const scannerRef = useRef(null);
-  const { checkUserByQr } = useAuth();
+const { checkUserByQr, linkUserQr } = useAuth();
 
   const [qrCode, setQrCode] = useState("");
+  const [isScanning, setIsScanning] = useState(false);
   const [rsvpCode, setRsvpCode] = useState("");
 
   const [user, setUser] = useState(null);
@@ -24,16 +23,27 @@ export default function VolunteerDashboard() {
   const [error, setError] = useState("");
 
   /* Scanner Setup */
-  useEffect(() => {
+useEffect(() => {
+    // If not scanning, clean up and exit
+    if (!isScanning) {
+      if (scannerRef.current) {
+        scannerRef.current.stop();
+        scannerRef.current.destroy();
+        scannerRef.current = null;
+      }
+      return;
+    }
+
     const videoElem = document.getElementById('qr-video');
     
     if (videoElem && !scannerRef.current) {
       scannerRef.current = new QrScanner(
         videoElem,
         (result) => {
-          const decodedText = result.data;
+          const decodedText = result.data.trim(); // Trim extra spaces
           setQrCode(decodedText);
-          handleScan(decodedText); // Pass directly to avoid state lag
+          setIsScanning(false); // NEW: Turn off camera after scan
+          handleScan(decodedText); 
         },
         {
           returnDetailedScanResult: true,
@@ -44,10 +54,12 @@ export default function VolunteerDashboard() {
 
       scannerRef.current.start().catch(err => {
         setError("Camera access denied or not found.");
+        setIsScanning(false);
         console.error(err);
       });
     }
 
+    // Cleanup on unmount or when isScanning becomes false
     return () => {
       if (scannerRef.current) {
         scannerRef.current.stop();
@@ -55,27 +67,32 @@ export default function VolunteerDashboard() {
         scannerRef.current = null;
       }
     };
-  }, []);
+  }, [isScanning]); // Re-run effect when isScanning changes
 
   /* Functions */
+  const openUser = (userData) => {
+    setUser(userData);
+    setPresent(userData.present || false);
+    setFoodCount(userData.foodCount || 0);
+    setShowModal(true);
+  };
+
   const handleScan = async (qrValue) => {
-    const qr = qrValue || qrCode;
+    const qr = (qrValue || qrCode).trim();
     if (!qr) return setError("Please enter or scan a QR code.");
 
     setLoading(true);
     setError("");
-    setShowRSVP(false); // Reset RSVP view on new scan
+    setShowRSVP(false);
 
     try {
-      const userData = await checkUserByQr(qr);
-      if (userData && userData.user) {
-        openUser(userData.user);
+      const data = await checkUserByQr(qr);
+      if (data && data.user) {
+        openUser(data.user);
       } else {
-        // If checkUserByQr returns successfully but no user found
         setShowRSVP(true);
       }
     } catch (err) {
-      // Typically 404 or unlinked QR triggers this
       setError("QR not linked to any user.");
       setShowRSVP(true);
     } finally {
@@ -84,20 +101,17 @@ export default function VolunteerDashboard() {
   };
 
   const handleRSVP = async () => {
-    if (!rsvpCode) return setError("Please enter an RSVP code.");
+    const cleanRSVP = rsvpCode.trim(); // FIX: Prevent Mongo space errors
+    const cleanQR = qrCode.trim();
+
+    if (!cleanRSVP) return setError("Please enter an RSVP code.");
+    if (!cleanQR) return setError("Missing QR Code.");
+
     setLoading(true);
     setError("");
 
     try {
-      const res = await fetch(`${API}/link-user`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ qrHash: qrCode, rsvpCode }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Invalid RSVP Code");
-
+      const data = await linkUserQr(cleanQR, cleanRSVP);
       setShowRSVP(false);
       setRsvpCode(""); 
       openUser(data.user);
@@ -107,25 +121,22 @@ export default function VolunteerDashboard() {
       setLoading(false);
     }
   };
-
-  const openUser = (u) => {
-    setUser(u);
-    setPresent(u.is_present);
-    setFoodCount(u.food_count || 0);
-    setShowModal(true);
-  };
-
-  const markAttendance = async (status) => {
+ const markAttendance = async (status) => {
     if (!status) {
       alert("The system currently only supports Check-Ins (Present).");
       return;
     }
 
     try {
-      const res = await fetch(`${API}/present/${encodeURIComponent(user.qr_hash)}`, {
+      const res = await fetch(`${backend_url}/scan/${encodeURIComponent(user.qr_hash)}/present`, {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: localStorage.getItem("authTokenAdmin"),
+        }
       });
-      if (!res.ok) throw new Error("Failed to update status");
+
+      if (!res.ok) throw new Error("Failed");
       setPresent(true);
     } catch {
       setError("Failed to mark attendance.");
@@ -135,12 +146,16 @@ export default function VolunteerDashboard() {
   const addFood = async () => {
     const nextCount = foodCount + 1;
     try {
-      const res = await fetch(`${API}/update/${encodeURIComponent(user.qr_hash)}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ food_count: nextCount }), // Ensure key matches backend
+      const res = await fetch(`${backend_url}/scan/${encodeURIComponent(user.qr_hash)}/update`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: localStorage.getItem("authTokenAdmin"),
+        },
+        body: JSON.stringify({ foodCountInc: nextCount })
       });
-      if (!res.ok) throw new Error();
+
+      if (!res.ok) throw new Error("Failed");
       setFoodCount(nextCount);
     } catch {
       setError("Failed to update food count.");
@@ -152,17 +167,21 @@ export default function VolunteerDashboard() {
     if (!roomName) return;
 
     try {
-      const res = await fetch(`${API}/update/${encodeURIComponent(user.qr_hash)}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ room_allot: roomName }), // Matches your whiteboard key
+      const res = await fetch(`${backend_url}/scan/${encodeURIComponent(user.qr_hash)}/update`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: localStorage.getItem("authTokenAdmin"),
+        },
+        body: JSON.stringify({ roomAllot: roomName })
       });
 
-      if (!res.ok) throw new Error("Failed to assign room");
+      if (!res.ok) throw new Error("Failed");
+      
       alert(`Successfully assigned to Room ${roomName}!`);
       setUser({ ...user, room_allot: roomName });
     } catch (err) {
-      alert(err.message);
+      alert("Failed to assign room.");
     }
   };
 
@@ -181,12 +200,28 @@ export default function VolunteerDashboard() {
         )}
 
         <div className="bg-white p-6 rounded-2xl shadow-xl mb-6 border border-slate-100">
-          <h2 className="text-xl font-bold mb-4">Scan Badge</h2>
+         <h2 className="text-xl font-bold mb-4">Scan Badge</h2>
           
-          <div className="rounded-lg overflow-hidden bg-black aspect-square mb-4">
-            <video id="qr-video" className="w-full h-full object-cover"></video>
-          </div>
-
+          {/* CAMERA TOGGLE UI */}
+          {isScanning ? (
+            <div className="rounded-lg overflow-hidden bg-black aspect-square mb-4 relative">
+              <video id="qr-video" className="w-full h-full object-cover"></video>
+              <button 
+                onClick={() => setIsScanning(false)}
+                className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-red-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-md"
+              >
+                Cancel Scan
+              </button>
+            </div>
+          ) : (
+            <div 
+              onClick={() => setIsScanning(true)}
+              className="rounded-lg bg-slate-100 aspect-square mb-4 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-200 transition-colors border-2 border-dashed border-slate-300"
+            >
+              <span className="text-4xl mb-2">📷</span>
+              <span className="font-semibold text-slate-500">Tap to Scan QR</span>
+            </div>
+          )}
           <div className="relative my-4">
             <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200"></div></div>
             <div className="relative flex justify-center text-sm"><span className="px-2 bg-white text-slate-500">Manual Entry</span></div>
