@@ -5,7 +5,6 @@ import "../../App.css";
 import { createPortal } from "react-dom";
 import Timer from "../Timer/Timer.jsx";
 import WD from "../../utils/wdAwards.jsx";
-import PWAInstallPrompt from "../../utils/PWAInstallPrompt.jsx";
 
 export default function Landing({ showPrizes, setShowPrizes, glowTrigger, setGlowTrigger }) {
 
@@ -273,9 +272,9 @@ export default function Landing({ showPrizes, setShowPrizes, glowTrigger, setGlo
               April 11th & 12th
             </p>
 
-            <div className="mb-4 text-lg reg tracking-wide">REGISTER AT</div>
+            <div className="mb-4 text-lg reg tracking-wide">REGISTRATIONS CLOSED</div>
 
-            <Button text="Unstop" link="https://unstop.com/college-fests/vihaan-90-ieee-dtu-delhi-technological-university-dtu-new-delhi-453051" />
+            <Button text="Login" link="http://localhost:5173/login" type={true} />
 
             {/* ── Timer: compact, below the Unstop button ── */}
             <div className="mt-8">

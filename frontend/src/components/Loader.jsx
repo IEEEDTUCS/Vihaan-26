@@ -149,7 +149,8 @@ function Intro({ onComplete, audioRef, autoStart = false }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center">
+    <div 
+      style={{ backgroundColor: "#000" }} className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center">
       {/* STRIP CONTAINER */}
       <motion.div
         initial={{ height: "40vh" }}
