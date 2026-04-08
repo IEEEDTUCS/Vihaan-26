@@ -10,7 +10,8 @@
     "test": "echo \"No tests\"",
     "dev": "nodemon --watch src --ext ts --exec \"ts-node src/main.ts\"",
     "build": "tsc",
-    "start": "node dist/main.js"
+    "start": "node dist/main.js",
+    "seedRooms": "ts-node src/scripts/seedRooms.ts"
   },
   "dependencies": {
     "@types/cors": "^2.8.19",
@@ -22,6 +23,7 @@
     "express": "^5.2.1",
     "express-rate-limit": "^8.3.2",
     "jsonwebtoken": "^9.0.3",
+    "mongodb": "^7.1.1",
     "mongoose": "^9.3.3",
     "multer": "^2.1.1",
     "nodemon": "^3.1.14",

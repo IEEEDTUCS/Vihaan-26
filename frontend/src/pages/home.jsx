@@ -18,9 +18,16 @@ import { Volume2, VolumeX } from "lucide-react";
 const setNotifCookie = (name, value, days=5) => {
   const expires = new Date(Date.now() + days * 864e5).toUTCString();
   document.cookie = `${name}=${value}; expires=${expires}; path=/; SameSite=Lax`;
+  //store in localStorage as fall back if cookies are blocked
+  localStorage.setItem(name, value);
 };
 
 const getNotifCookie = (name) => {
+  //try from localStorage first
+  const lsValue = localStorage.getItem(name);
+  if (lsValue) return lsValue;
+  
+  //fall back to cookies
   return document.cookie.split("; ").find((row) => row.startsWith(name + "="))?.split("=")[1];
 };
 
