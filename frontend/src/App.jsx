@@ -6,6 +6,7 @@ import UserDashboard from "./pages/UserDashboard.jsx";
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext.jsx";
+import VolunteerLogin from "./components/VolunteerLogin.jsx";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
             <Route path='/' element={<Home />} />
             <Route path="/login" element={<AuthPage />} />
             <Route path="/admin" element={<AdminAuth />} />
+            <Route path="/volunteer-login" element={<VolunteerLogin />}/>
              <Route path="/volunteerDashboard" element={<VolunteerDashboard />} />
             <Route path="/userDashboard" element={<UserDashboard />} />
       </Routes>
