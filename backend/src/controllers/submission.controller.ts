@@ -9,7 +9,7 @@ export const submitInitial = async (req: Request, res: Response) => {
     const user = req.user as any;
     const { type, category, description, repo_link } = req.body;
 
-    const team = await Team.find({ team_id: user.team_id });
+    const team = await Team.findOne({ team_id: user.team_id });
     if (!team) throw new ExpressError(404, "Team not found");
 
     // initial submission window (2–3 PM day 1)

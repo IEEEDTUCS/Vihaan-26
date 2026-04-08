@@ -118,6 +118,7 @@ const adminauth = () => {
                         {loading ? 'Logging in...' : 'Log In'}
                     </button>
                 </form>
+
             </div>
         </div>
     );

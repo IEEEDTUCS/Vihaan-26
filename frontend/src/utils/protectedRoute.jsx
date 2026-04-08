@@ -28,16 +28,17 @@ export function VolunteerProtectedRoute() {
 export function AdminProtectedRoute() {
   const { isAuthenticated, admin, user } = useAuth();
 //   console.log(admin)
-  if (!isAuthenticated || !user) {
-    return <Navigate to="/login" replace />;
-  }
 
   if(user) {
     return <Navigate to="/userDashboard" replace />;
   }
 
-  if (!admin || admin.role !== "SUPER_ADMIN") {
-    return <Navigate to="/volunteer-login" replace />;
+  if (admin && admin.role !== "SUPER_ADMIN") {
+    return <Navigate to="/volunteerDashboard" replace />;
+  }
+
+  if (!isAuthenticated || !admin) {
+    return <Navigate to="/login" replace />;
   }
 
   return <Outlet />;

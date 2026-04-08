@@ -70,11 +70,12 @@ export const AuthProvider = ({ children }) => {
     const res = await fetch(`${backend_url}/api/admin/me`, {
       method: "GET",
       headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`, // ✅ FIX
-    },
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
     });
-
+    
+    console.log(res);
     const data = await res.json().catch(() => ({}));
 
     if (!res.ok) {

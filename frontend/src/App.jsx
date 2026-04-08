@@ -1,9 +1,9 @@
 import Home from "./pages/home.jsx";
-import AuthPage from "./pages/AuthPage.jsx";
+import AuthPage from "./pages/authpage.jsx";
 import AdminAuth from "./pages/adminauth.jsx";
 import VolunteerDashboard from "./pages/VolunteerDashboard.jsx";
 import UserDashboard from "./pages/UserDashboard.jsx";
-import AdminDashboard from "./pages/AdminDashboard.jsx";
+import SuperAdminDashboard from "./pages/SuperAdminDashboard.jsx";
 import "./App.css";
 import { ProtectedRoute, VolunteerProtectedRoute, AdminProtectedRoute } from "./utils/protectedRoute.jsx";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
@@ -30,7 +30,7 @@ function App() {
             </Route>
 
             <Route element={<AdminProtectedRoute />}>
-              <Route path="/adminDashboard" element={<AdminDashboard />} />
+              <Route path="/adminDashboard" element={<SuperAdminDashboard />} />
             </Route>
           </Routes>
         </AuthProvider>

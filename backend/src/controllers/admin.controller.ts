@@ -52,7 +52,7 @@ export const updateTeam = async (req: Request, res: Response) => {
     const { id } = req.params;
     const updateData = req.body;
 
-    const team = await Team.findByIdAndUpdate(id, updateData, {
+    const team = await Team.findByIdAndUpdate( id, updateData, {
         new: true,
         runValidators: true,
     });
@@ -77,7 +77,8 @@ export const updateCheckpointStatus = async (req: Request, res: Response) => {
         throw new ExpressError(404, "Team not found");
     }
 
-    const checkpoint = team.checkpoints.find((cp) => cp.round_num === round_num);
+    const round = Number(round_num);
+    const checkpoint = team.checkpoints.find((cp) => cp.round_num === round);
     if (!checkpoint) {
         throw new ExpressError(400, `Round ${round_num} not found for this team`);
     }
