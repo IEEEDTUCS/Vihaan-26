@@ -53,6 +53,17 @@ jobs:
       # =========================
       # FRONTEND DEPLOY
       # =========================
+
+      # =========================
+      
+      # FRONTEND ENV
+      # =========================
+      - name: Create frontend .env
+        run: |
+          echo "VITE_BACKEND_URL=https://api.notif.invictusdtu.in" > frontend/.env
+          echo "VITE_PUBLIC_VAPID_KEY=BLPn-8YuCP39crJWXYcptqfvxZHBTuEbqJqwwlqyJQk-yWd-MdoODjLpd6o5HmaeK9JKaRAAJ46iDuEedgOFglo" >> frontend/.env
+          echo "VITE_BACKEND_URL_VIHAAN=https://vihaan.ieeedtu.in/api" >> frontend/.env
+          
       - name: Install frontend deps
         working-directory: frontend
         run: npm ci
