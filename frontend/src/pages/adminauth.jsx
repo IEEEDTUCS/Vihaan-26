@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -8,8 +8,23 @@ const adminauth = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const { login} = useAuth();
+    const { login, admin} = useAuth();
     const navigate = useNavigate();
+
+    useEffect(() => {
+      
+      if(!admin) return;
+    
+      if (admin && admin.role === "SUPER_ADMIN") {
+        navigate("/adminDashboard");
+        return;
+      }
+    
+      if (admin) {
+        navigate("/volunteerDashboard");
+      }
+    
+    }, [admin]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

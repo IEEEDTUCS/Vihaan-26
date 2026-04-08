@@ -1,7 +1,7 @@
 import React, {createContext, useContext, useEffect, useState} from 'react';
 
 const AuthContext = createContext(null);
-const BACKEND = import.meta.env.VITE_BACKEND_URL_VIHAAN || "http://localhost:3000";
+const backend_url = import.meta.env.VITE_BACKEND_URL_VIHAAN;
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -29,6 +29,7 @@ export const AuthProvider = ({ children }) => {
         if (storedTokenAdmin) {
           const currentAdmin = await fetchMeAdmin(storedTokenAdmin);
           if (currentAdmin) {
+            // console.log("Admin authenticated:", currentAdmin);
             setAdmin(currentAdmin);
             localStorage.removeItem("authTokenUser");
             setUser(null);
@@ -48,12 +49,12 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const fetchMe = async (token) => {
-    const res = await fetch(`${BACKEND}/api/user/me`, {
-      method: "POST",
+    const res = await fetch(`${backend_url}/api/user/me`, {
+      method: "GET",
       headers: {
-        "Content-Type": "application/json",
-        authorization: token,
-      },
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`, // ✅ FIX
+    },
     });
 
     const data = await res.json().catch(() => ({}));
@@ -66,9 +67,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   const fetchMeAdmin = async (token) => {
-    // console.log("Fetching admin details with token:", token);
-    const res = await fetch(`${BACKEND}/api/admin/me`, {
-      method: "GET",          //******************************** GET as per admin route, POST incorrectly handles the req 
+    const res = await fetch(`${backend_url}/api/admin/me`, {
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`,
@@ -93,7 +93,7 @@ export const AuthProvider = ({ children }) => {
       : { email: identifier, code: password };
 
   
-      const res = await fetch(`${BACKEND}${endpoint}`, {
+      const res = await fetch(`${backend_url}${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

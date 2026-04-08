@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -8,9 +8,20 @@ const AuthPage = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const {login} = useAuth();
+    const {login, user} = useAuth();
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+      
+      if(!user) return;
+    
+      if (user) {
+        navigate("/userDashboard");
+        return;
+      }
+    
+    }, [user]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

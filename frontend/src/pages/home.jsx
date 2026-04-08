@@ -104,7 +104,7 @@ function home() {
   }, []);
 
   return (
-    <>
+    <div style={{ backgroundColor: "#000" }}>
    
       {!showGate && !showIntro && (
         <button
@@ -205,7 +205,7 @@ function home() {
           </div>
         </>
       )}
-    </>
+    </div>
   );
 }
 
