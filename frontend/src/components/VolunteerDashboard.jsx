@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import QrScanner from 'qr-scanner';
 import { useAuth } from "../context/AuthContext"; 
-const backend_url = import.meta.env.VITE_BACKEND_URL_VIHAAN;
+// const backend_url = import.meta.env.VITE_BACKEND_URL_VIHAAN;
 
 export default function VolunteerDashboard() {
   /* State */
   const scannerRef = useRef(null);
-const { checkUserByQr, linkUserQr } = useAuth();
+    const { checkUserByQr, linkUserQr, markUserPresent } = useAuth();
 
   const [qrCode, setQrCode] = useState("");
   const [isScanning, setIsScanning] = useState(false);
@@ -121,69 +121,82 @@ useEffect(() => {
       setLoading(false);
     }
   };
- const markAttendance = async (status) => {
-    if (!status) {
-      alert("The system currently only supports Check-Ins (Present).");
-      return;
-    }
 
-    try {
-      const res = await fetch(`${backend_url}/scan/${encodeURIComponent(user.qr_hash)}/present`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          authorization: localStorage.getItem("authTokenAdmin"),
+  const markAttendance = async () => {
+        setLoading(true);
+        setError("");
+        try {
+            const data = await markUserPresent(user.qr_hash);
+            setUser(data.user);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
         }
-      });
+    };
+ // const markAttendance = async (status) => {
+ //    if (!status) {
+ //      alert("The system currently only supports Check-Ins (Present).");
+ //      return;
+ //    }
+ //
+ //    try {
+ //      const res = await fetch(`${backend_url}/scan/${encodeURIComponent(user.qr_hash)}/present`, {
+ //        method: "POST",
+ //        headers: {
+ //          "Content-Type": "application/json",
+ //          authorization: localStorage.getItem("authTokenAdmin"),
+ //        }
+ //      });
+ //
+ //      if (!res.ok) throw new Error("Failed");
+ //      setPresent(true);
+ //    } catch {
+ //      setError("Failed to mark attendance.");
+ //    }
+ //  };
 
-      if (!res.ok) throw new Error("Failed");
-      setPresent(true);
-    } catch {
-      setError("Failed to mark attendance.");
-    }
-  };
+  // const addFood = async () => {
+  //   const nextCount = foodCount + 1;
+  //   try {
+  //     const res = await fetch(`${backend_url}/scan/${encodeURIComponent(user.qr_hash)}/update`, {
+  //       method: "PUT",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         authorization: localStorage.getItem("authTokenAdmin"),
+  //       },
+  //       body: JSON.stringify({ foodCountInc: nextCount })
+  //     });
+  //
+  //     if (!res.ok) throw new Error("Failed");
+  //     setFoodCount(nextCount);
+  //   } catch {
+  //     setError("Failed to update food count.");
+  //   }
+  // };
 
-  const addFood = async () => {
-    const nextCount = foodCount + 1;
-    try {
-      const res = await fetch(`${backend_url}/scan/${encodeURIComponent(user.qr_hash)}/update`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          authorization: localStorage.getItem("authTokenAdmin"),
-        },
-        body: JSON.stringify({ foodCountInc: nextCount })
-      });
-
-      if (!res.ok) throw new Error("Failed");
-      setFoodCount(nextCount);
-    } catch {
-      setError("Failed to update food count.");
-    }
-  };
-
-  const assignRoom = async () => {
-    const roomName = prompt("Enter Room Number:");
-    if (!roomName) return;
-
-    try {
-      const res = await fetch(`${backend_url}/scan/${encodeURIComponent(user.qr_hash)}/update`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          authorization: localStorage.getItem("authTokenAdmin"),
-        },
-        body: JSON.stringify({ roomAllot: roomName })
-      });
-
-      if (!res.ok) throw new Error("Failed");
-      
-      alert(`Successfully assigned to Room ${roomName}!`);
-      setUser({ ...user, room_allot: roomName });
-    } catch (err) {
-      alert("Failed to assign room.");
-    }
-  };
+  // const assignRoom = async () => {
+  //   const roomName = prompt("Enter Room Number:");
+  //   if (!roomName) return;
+  //
+  //   try {
+  //     const res = await fetch(`${backend_url}/scan/${encodeURIComponent(user.qr_hash)}/update`, {
+  //       method: "PUT",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         authorization: localStorage.getItem("authTokenAdmin"),
+  //       },
+  //       body: JSON.stringify({ roomAllot: roomName })
+  //     });
+  //
+  //     if (!res.ok) throw new Error("Failed");
+  //
+  //     alert(`Successfully assigned to Room ${roomName}!`);
+  //     setUser({ ...user, room_allot: roomName });
+  //   } catch (err) {
+  //     alert("Failed to assign room.");
+  //   }
+  // };
 
   /* UI Render */
   return (
@@ -199,9 +212,29 @@ useEffect(() => {
           </div>
         )}
 
+          {showRSVP && (
+              <div className="bg-white p-6 rounded-2xl shadow-xl border border-orange-100 mb-4">
+                  <h2 className="text-xl font-bold mb-2">Unlinked QR detected</h2>
+                  <p className="text-sm text-slate-500 mb-4">Link this badge to a guest RSVP code.</p>
+                  <input
+                      className="w-full border border-slate-300 p-3 rounded-lg mb-4"
+                      placeholder="e.g. RSVP-123"
+                      value={rsvpCode}
+                      onChange={(e) => setRsvpCode(e.target.value)}
+                  />
+                  <button
+                      onClick={handleRSVP}
+                      className="w-full bg-slate-900 text-white font-semibold py-3 rounded-lg cursor-pointer hover:bg-slate-800"
+                  >
+                      Link User
+                  </button>
+              </div>
+          )}
+
         <div className="bg-white p-6 rounded-2xl shadow-xl mb-6 border border-slate-100">
+
          <h2 className="text-xl font-bold mb-4">Scan Badge</h2>
-          
+
           {/* CAMERA TOGGLE UI */}
           {isScanning ? (
             <div className="rounded-lg overflow-hidden bg-black aspect-square mb-4 relative">
@@ -243,24 +276,6 @@ useEffect(() => {
           </button>
         </div>
 
-        {showRSVP && (
-          <div className="bg-white p-6 rounded-2xl shadow-xl border border-orange-100 animate-pulse">
-            <h2 className="text-xl font-bold mb-2">Unlinked QR detected</h2>
-            <p className="text-sm text-slate-500 mb-4">Link this badge to a guest RSVP code.</p>
-            <input
-              className="w-full border border-slate-300 p-3 rounded-lg mb-4"
-              placeholder="e.g. RSVP-123"
-              value={rsvpCode}
-              onChange={(e) => setRsvpCode(e.target.value)}
-            />
-            <button
-              onClick={handleRSVP}
-              className="w-full bg-slate-900 text-white font-semibold py-3 rounded-lg"
-            >
-              Link User
-            </button>
-          </div>
-        )}
       </div>
 
       {/* USER MODAL */}
@@ -272,24 +287,27 @@ useEffect(() => {
 
             <div className="flex gap-3 mb-6">
               <button
-                onClick={() => markAttendance(true)}
+                onClick={() => markAttendance()}
                 className={`flex-1 py-3 rounded-xl font-bold transition-all ${
-                  present ? "bg-emerald-100 text-emerald-700 ring-2 ring-emerald-500" : "bg-emerald-500 text-white"
+                  user.is_present ? "bg-emerald-100 text-emerald-700 ring-2 ring-emerald-500" : "bg-emerald-500 text-white"
                 }`}
               >
-                {present ? "✓ Checked In" : "Check In"}
+                {user.is_present ? "✓ Checked In" : "Check In"}
               </button>
             </div>
 
-            {present && (
+            {user.is_present && (
               <div className="space-y-3 pt-4 border-t border-slate-100">
                 <div className="flex items-center justify-between bg-slate-50 p-3 rounded-xl">
                   <span className="font-semibold">Meals: {foodCount}</span>
-                  <button onClick={addFood} className="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg font-bold">+</button>
+                  <button  className="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg font-bold">+</button>
                 </div>
-                <button onClick={assignRoom} className="w-full bg-slate-100 py-3 rounded-xl font-semibold">
-                  {user.room_allot ? `Room: ${user.room_allot}` : "Assign Room"}
-                </button>
+                  <div className="flex items-center justify-between bg-slate-50 p-3 rounded-xl">
+                      <span className="font-semibold">Room Alloted: {user.room_allot || "Not Alloted"}</span>
+                  </div>
+                {/*<button  className="w-full bg-slate-100 py-3 rounded-xl font-semibold">*/}
+                {/*  {user.room_allot ? `Room: ${user.room_allot}` : "Assign Room"}*/}
+                {/*</button>*/}
               </div>
             )}
 

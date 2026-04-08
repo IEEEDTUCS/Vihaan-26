@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, {createContext, useContext, useEffect, useState} from 'react';
 
 const AuthContext = createContext(null);
 const backend_url = import.meta.env.VITE_BACKEND_URL_VIHAAN;
@@ -129,31 +129,59 @@ export const AuthProvider = ({ children }) => {
   };
 
   const checkUserByQr = async (code) => {
-    const res = await fetch(`${backend_url}/scan/code` , {
+    const res = await fetch(`${backend_url}/api/user/scan/${code}` , {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        authorization: localStorage.getItem("authTokenAdmin"),
+        authorization: `Bearer ${localStorage.getItem("authTokenAdmin")}`,
       },
-      params: JSON.stringify({code}),
     })
 
     if(!res.ok){
       throw new Error("User not found");
     }
-    const data = await res.json();
-    return data;
+    return await res.json();
 
   }
  const linkUserQr = async (qrHash, rsvpCode) => {
     try {
+      const reqBody = {
+        rsvpCode,
+        qrHash,
+      }
       // MATCHES: router.post("/linkQr")
-      const res = await axios.post(
+      const res = await fetch(
         `${backend_url}/api/user/linkQr`,
-        { qrHash, rsvpCode }, 
-        { headers: { authorization: localStorage.getItem("authTokenAdmin") } }
+        {
+          method: "POST",
+          headers: {
+           "Content-Type": "application/json",
+            authorization: `Bearer ${localStorage.getItem("authTokenAdmin")}`,
+          },
+          body: JSON.stringify(reqBody)
+        },
       );
-      return res.data;
+      return await res.json();
+    } catch (error) {
+      const backendMessage = error.response?.data?.message || error.response?.data?.error;
+      throw new Error(backendMessage || "Invalid RSVP Code.");
+    }
+  };
+
+  const markUserPresent = async (qrHash) => {
+    try {
+      // MATCHES: router.post("/linkQr")
+      const res = await fetch(
+          `${backend_url}/api/user/scan/${qrHash}/present`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              authorization: `Bearer ${localStorage.getItem("authTokenAdmin")}`,
+            },
+          },
+      );
+      return await res.json();
     } catch (error) {
       const backendMessage = error.response?.data?.message || error.response?.data?.error;
       throw new Error(backendMessage || "Invalid RSVP Code.");
@@ -169,6 +197,7 @@ export const AuthProvider = ({ children }) => {
     logout,
     checkUserByQr,
     linkUserQr,
+    markUserPresent,
     isAuthenticated: !!user || !!admin,
   };
 
