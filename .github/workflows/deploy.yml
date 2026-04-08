@@ -1,0 +1,67 @@
+name: Deploy Vihaan
+
+on:
+  push:
+    branches: ["main"]
+
+concurrency:
+  group: vihaan-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      # =========================
+      # BACKUP ENV
+      # =========================
+      - name: Backup backend .env
+        run: |
+          if [ -f ~/Vihaan-26/backend/.env ]; then
+            cp ~/Vihaan-26/backend/.env /tmp/backend_env
+          fi
+
+      # =========================
+      # GET LATEST CODE
+      # =========================
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Restore backend .env
+        run: |
+          if [ -f /tmp/backend_env ]; then
+            cp /tmp/backend_env backend/.env
+          fi
+
+      # =========================
+      # BACKEND DEPLOY
+      # =========================
+      - name: Install backend deps
+        working-directory: backend
+        run: npm ci
+
+      - name: Build backend
+        working-directory: backend
+        run: npm run build
+
+      - name: Restart backend
+        run: |
+          pm2 reload vihaan-backend --update-env || pm2 start backend/dist/main.js --name vihaan-backend
+          pm2 save
+
+      # =========================
+      # FRONTEND DEPLOY
+      # =========================
+      - name: Install frontend deps
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+      - name: Deploy frontend
+        run: |
+          sudo rm -rf /var/www/vihaan/*
+          sudo cp -r frontend/dist/* /var/www/vihaan/

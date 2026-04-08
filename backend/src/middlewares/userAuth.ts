@@ -13,7 +13,7 @@ interface UserJwtPayload {
 declare global {
     namespace Express {
         interface Request {
-            user?: InstanceType<typeof User>;
+            user?: InstanceType<typeof User>;//used to extend Express’s Request type.
         }
     }
 }

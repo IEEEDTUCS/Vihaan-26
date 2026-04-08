@@ -15,5 +15,10 @@ export const handleCSVUpload = async (req: Request, res: Response): Promise<void
     }
 };
 
-//image upload also here
-
+//image upload also here(cloudinary setup)
+export const handleImageUpload = async (req: Request, res: Response): Promise<void> => {
+    if (!req.file) {
+        res.status(400).json({ success: false, error: "Image file is required" });
+        return;
+    }
+};

@@ -5,9 +5,10 @@ import {
     markUserPresent,
     userLogin,
     userMe,
-    userVolunteerUpdatePayload
+    userVolunteerUpdatePayload,
+    teamLeaderProjectSubmission
 } from "../controllers/user.controller";
-import { userAuth } from "../middlewares/userAuth";
+import { userAuth, leaderOnly } from "../middlewares/userAuth";
 import { validate } from "../middlewares/validate";
 import { userLoginSchema } from "../schemas";
 import { wrapAsync } from "../utils/wrapAsync";
@@ -32,5 +33,7 @@ router.post("/scan/:qrHash/present", adminAuth, wrapAsync(markUserPresent));
 
 // Update User Fields By Volunteer
 router.put("/scan/:qrHash/update", adminAuth, wrapAsync(userVolunteerUpdatePayload));
+
+router.put("/submitLink", userAuth, leaderOnly, wrapAsync(teamLeaderProjectSubmission));
 
 export default router;

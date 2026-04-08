@@ -27,7 +27,6 @@ export const userLogin = async (req: Request, res: Response) => {
             is_present: user.is_present,
             food_count: user.food_count,
             bedsheet_taken: user.bedsheet_taken,
-            qr_hash: user.qr_hash,
         },
     });
 };
@@ -136,7 +135,7 @@ export const markUserPresent = async (req: Request, res: Response) => {
 }
 
 interface userVolunteerUpdatePayload {
-    foodCountInc?: number;
+    foodCountInc?: boolean;
     roomAllot?: string;
     bedsheetTakenInc?: boolean;
 }
@@ -193,3 +192,28 @@ export const userVolunteerUpdatePayload = async (req: Request, res: Response) =>
         }
     })
 }
+
+//ppt-link and repo link or image-link submission( team leader )
+export const teamLeaderProjectSubmission = async (req: Request, res: Response) => {
+    const { projectCategory, teamCategory, description, pptLink , projectLink } = req.body;
+    const user = req.user as any;
+
+    if (user.role !== "LEADER") throw new ExpressError(403, "Only team leaders can submit project links");
+    if (!pptLink && !projectLink) throw new ExpressError(400, "At least one link is required");
+
+    const team = await Team.findById(user.team_id);
+    if (!team) throw new ExpressError(404, "Team not found");
+
+    team.ppt_link = pptLink;
+    team.repo_or_image_link= projectLink;
+    await team.save();
+
+    res.status(200).json({
+        success: true,
+        message: "Project links updated successfully"
+        })
+    
+}
+
+
+//commit links and image-link submission (team leader) 
