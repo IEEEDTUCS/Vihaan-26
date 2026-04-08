@@ -29,6 +29,7 @@ export const AuthProvider = ({ children }) => {
         if (storedTokenAdmin) {
           const currentAdmin = await fetchMeAdmin(storedTokenAdmin);
           if (currentAdmin) {
+            // console.log("Admin authenticated:", currentAdmin);
             setAdmin(currentAdmin);
             localStorage.removeItem("authTokenUser");
             setUser(null);
@@ -49,11 +50,11 @@ export const AuthProvider = ({ children }) => {
 
   const fetchMe = async (token) => {
     const res = await fetch(`${backend_url}/api/user/me`, {
-      method: "POST",
+      method: "GET",
       headers: {
-        "Content-Type": "application/json",
-        authorization: token,
-      },
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`, // ✅ FIX
+    },
     });
 
     const data = await res.json().catch(() => ({}));
@@ -67,11 +68,11 @@ export const AuthProvider = ({ children }) => {
 
   const fetchMeAdmin = async (token) => {
     const res = await fetch(`${backend_url}/api/admin/me`, {
-      method: "POST",
+      method: "GET",
       headers: {
-        "Content-Type": "application/json",
-        authorization: token,
-      },
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`, // ✅ FIX
+    },
     });
 
     const data = await res.json().catch(() => ({}));

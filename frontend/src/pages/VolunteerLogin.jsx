@@ -1,18 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-// Environment variables
-const API = import.meta.env.VITE_BACKEND_URL_VIHAAN;
-const ADMIN_SECRET_KEY = import.meta.env.VITE_ADMIN_CREATION_KEY;
-
 export default function VolunteerLogin() {
-  const { login } = useAuth();
+  const { login, admin } = useAuth();
   const navigate = useNavigate();
 
-  // Mode Toggle: true = Login, false = Sign Up
-  const [isLogin, setIsLogin] = useState(true);
-  
   // Password Visibility Toggle
   const [showPassword, setShowPassword] = useState(false);
 
@@ -22,14 +15,21 @@ export default function VolunteerLogin() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Handle switching between Login and Sign Up
-  const toggleMode = () => {
-    setIsLogin(!isLogin);
-    setError(""); 
-    setUsername("");
-    setPassword("");
-    setShowPassword(false); // Reset password visibility when switching modes
-  };
+
+useEffect(() => {
+  
+  if(!admin) return;
+
+  if (admin && admin.role === "SUPER_ADMIN") {
+    navigate("/adminDashboard");
+    return;
+  }
+
+  if (admin) {
+    navigate("/volunteerDashboard");
+  }
+
+}, [admin]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,56 +41,13 @@ export default function VolunteerLogin() {
 
     setLoading(true);
 
-    if (isLogin) {
-      // login
-      try {
-        await login(username, password, "admin");
-        navigate("/volunteerDashboard"); 
-      } catch (err) {
-        setError(err.message || "Invalid credentials. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-
-    } else {
-      // signup
-      try {
-        if (!ADMIN_SECRET_KEY) {
-          throw new Error("Admin creation key is missing from frontend .env file.");
-        }
-
-        const res = await fetch(`${API}/api/admin/create`, {
-          method: "POST",
-          headers: { 
-            "Content-Type": "application/json",
-            "x-admin-key": ADMIN_SECRET_KEY 
-          },
-          body: JSON.stringify({ 
-            username: username, 
-            password: password, 
-            role: "VOLUNTEER"
-          }),
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          // Captures exact error from backend
-          const backendError = data.error || data.message || "Failed to create account.";
-          throw new Error(backendError);
-        }
-
-        // Success! Alert the user and snap back to the login view
-        alert("Volunteer account created successfully! You can now log in.");
-        setIsLogin(true); 
-        setPassword(""); 
-        setShowPassword(false);
-        
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
+    try {
+      await login(username, password, "admin");
+      navigate("/volunteerDashboard"); 
+    } catch (err) {
+      setError(err.message || "Invalid credentials. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -100,10 +57,10 @@ export default function VolunteerLogin() {
         
         <div className="text-center mb-8">
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-            {isLogin ? "Volunteer Portal" : "Volunteer Sign Up"}
+            Volunteer Portal
           </h1>
           <p className="text-slate-500 mt-2">
-            {isLogin ? "Sign in to access the check-in dashboard" : "Create your account using the master key"}
+            Sign in to access the check-in dashboard
           </p>
         </div>
 
@@ -122,7 +79,7 @@ export default function VolunteerLogin() {
             <input
               type="text"
               className="w-full border border-slate-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-              placeholder={isLogin ? "Enter username" : "e.g. volunteer_drishti"}
+              placeholder="Enter username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
@@ -167,22 +124,9 @@ export default function VolunteerLogin() {
             disabled={loading}
             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg mt-4 disabled:opacity-50 transition-colors"
           >
-            {loading 
-              ? (isLogin ? "Authenticating..." : "Creating Account...") 
-              : (isLogin ? "Login" : "Create Account")}
+            {loading ? "Authenticating..." : "Login"}
           </button>
         </form>
-
-        <div className="mt-6 text-center text-sm text-slate-500">
-          {isLogin ? "Need to register a new volunteer? " : "Already have an account? "}
-          <button 
-            type="button"
-            onClick={toggleMode} 
-            className="text-indigo-600 hover:text-indigo-800 font-bold outline-none"
-          >
-            {isLogin ? "Sign up here" : "Log in here"}
-          </button>
-        </div>
         
       </div>
     </div>

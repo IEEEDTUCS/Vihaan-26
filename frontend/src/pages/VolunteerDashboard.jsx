@@ -7,7 +7,7 @@ import {useNavigate} from "react-router-dom";
 export default function VolunteerDashboard() {
   /* State */
   const scannerRef = useRef(null);
-  const { admin, isAuthenticated, checkUserByQr, linkUserQr, markUserPresent, updateUserFoodCount, updateUserBeddingTaken } = useAuth();
+  const { checkUserByQr, linkUserQr, markUserPresent, updateUserFoodCount, updateUserBeddingTaken } = useAuth();
 
   const [qrCode, setQrCode] = useState("");
   const [isScanning, setIsScanning] = useState(false);
@@ -17,19 +17,8 @@ export default function VolunteerDashboard() {
   const [showModal, setShowModal] = useState(false);
   const [showRSVP, setShowRSVP] = useState(false);
 
-  // const [present, setPresent] = useState(false);
-  // const [foodCount, setFoodCount] = useState(0);
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  const navigate = useNavigate();
-
-  useEffect(() => {
-      if (!isAuthenticated) {
-          navigate("/volunteer-login");
-      }
-  }, [isAuthenticated, navigate])
 
   /* Scanner Setup */
 useEffect(() => {
@@ -89,7 +78,8 @@ useEffect(() => {
   const handleScan = async (qrValue) => {
     const qr = (qrValue || qrCode).trim();
     if (!qr) return setError("Please enter or scan a QR code.");
-
+    if (qr.length !== 8) return setError("QR code must be exactly 8 characters.");
+    
     setLoading(true);
     setError("");
     setShowRSVP(false);
@@ -233,6 +223,8 @@ useEffect(() => {
           <input
             className="w-full border border-slate-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
             placeholder="Enter QR Hash"
+            min={8}
+            max={8}
             value={qrCode}
             onChange={(e) => setQrCode(e.target.value)}
           />

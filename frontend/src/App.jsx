@@ -1,30 +1,42 @@
 import Home from "./pages/home.jsx";
 import AuthPage from "./pages/AuthPage.jsx";
 import AdminAuth from "./pages/adminauth.jsx";
-import VolunteerDashboard from "./components/VolunteerDashboard.jsx";
+import VolunteerDashboard from "./pages/VolunteerDashboard.jsx";
 import UserDashboard from "./pages/UserDashboard.jsx";
+import AdminDashboard from "./pages/AdminDashboard.jsx";
 import "./App.css";
+import { ProtectedRoute, VolunteerProtectedRoute, AdminProtectedRoute } from "./utils/protectedRoute.jsx";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext.jsx";
-import VolunteerLogin from "./components/VolunteerLogin.jsx";
+import VolunteerLogin from "./pages/VolunteerLogin.jsx";
 
 function App() {
   return (
     <div>
-     <Router>
-       <AuthProvider>
-      <Routes>
-            <Route path='/' element={<Home />} />
+      <Router>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<Home />} />
             <Route path="/login" element={<AuthPage />} />
             <Route path="/admin" element={<AdminAuth />} />
-            <Route path="/volunteer-login" element={<VolunteerLogin />}/>
-             <Route path="/volunteerDashboard" element={<VolunteerDashboard />} />
-            <Route path="/userDashboard" element={<UserDashboard />} />
-      </Routes>
-      </AuthProvider>
-     </Router>
+            <Route path="/volunteer-login" element={<VolunteerLogin />} />
+
+            {/* Protected Routes */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/userDashboard" element={<UserDashboard />} />
+            </Route>
+            <Route element={<VolunteerProtectedRoute />}>
+              <Route path="/volunteerDashboard" element={<VolunteerDashboard />} />
+            </Route>
+
+            <Route element={<AdminProtectedRoute />}>
+              <Route path="/adminDashboard" element={<AdminDashboard />} />
+            </Route>
+          </Routes>
+        </AuthProvider>
+      </Router>
     </div>
-  )
+  );
 }
 
 export default App;

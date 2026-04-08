@@ -65,7 +65,7 @@ export const uploadCSV = async (buffer: Buffer) => {
         // Normalize role
         let normalizedRole: "LEADER" | "MEMBER";
         try {
-            normalizedRole = normalizeRole(raw["Candidate role"] ?? raw["Role"] ?? "");
+            normalizedRole = normalizeRole(raw["Candidate role"] ?? raw["Role"] ?? raw["User Type"] ?? "");
         } catch (e: any) {
             errors.push({ row: i + 1, error: e.message });
             continue;
