@@ -6,7 +6,7 @@ import { useAuth } from "../context/AuthContext";
 export default function VolunteerDashboard() {
   /* State */
   const scannerRef = useRef(null);
-    const { checkUserByQr, linkUserQr, markUserPresent } = useAuth();
+    const { checkUserByQr, linkUserQr, markUserPresent, updateUserFoodCount, updateUserBeddingTaken } = useAuth();
 
   const [qrCode, setQrCode] = useState("");
   const [isScanning, setIsScanning] = useState(false);
@@ -16,8 +16,8 @@ export default function VolunteerDashboard() {
   const [showModal, setShowModal] = useState(false);
   const [showRSVP, setShowRSVP] = useState(false);
 
-  const [present, setPresent] = useState(false);
-  const [foodCount, setFoodCount] = useState(0);
+  // const [present, setPresent] = useState(false);
+  // const [foodCount, setFoodCount] = useState(0);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -72,8 +72,8 @@ useEffect(() => {
   /* Functions */
   const openUser = (userData) => {
     setUser(userData);
-    setPresent(userData.present || false);
-    setFoodCount(userData.foodCount || 0);
+    // setPresent(userData.present || false);
+    // setFoodCount(userData.foodCount || 0);
     setShowModal(true);
   };
 
@@ -134,71 +134,32 @@ useEffect(() => {
             setLoading(false);
         }
     };
- // const markAttendance = async (status) => {
- //    if (!status) {
- //      alert("The system currently only supports Check-Ins (Present).");
- //      return;
- //    }
- //
- //    try {
- //      const res = await fetch(`${backend_url}/scan/${encodeURIComponent(user.qr_hash)}/present`, {
- //        method: "POST",
- //        headers: {
- //          "Content-Type": "application/json",
- //          authorization: localStorage.getItem("authTokenAdmin"),
- //        }
- //      });
- //
- //      if (!res.ok) throw new Error("Failed");
- //      setPresent(true);
- //    } catch {
- //      setError("Failed to mark attendance.");
- //    }
- //  };
 
-  // const addFood = async () => {
-  //   const nextCount = foodCount + 1;
-  //   try {
-  //     const res = await fetch(`${backend_url}/scan/${encodeURIComponent(user.qr_hash)}/update`, {
-  //       method: "PUT",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         authorization: localStorage.getItem("authTokenAdmin"),
-  //       },
-  //       body: JSON.stringify({ foodCountInc: nextCount })
-  //     });
-  //
-  //     if (!res.ok) throw new Error("Failed");
-  //     setFoodCount(nextCount);
-  //   } catch {
-  //     setError("Failed to update food count.");
-  //   }
-  // };
+    const addFood = async () => {
+        setLoading(true);
+        setError("");
+        try {
+            const data = await updateUserFoodCount(user.qr_hash);
+            setUser(data.user);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+    const addBedding = async () => {
+        setLoading(true);
+        setError("");
+        try {
+            const data = await updateUserBeddingTaken(user.qr_hash);
+            setUser(data.user);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  // const assignRoom = async () => {
-  //   const roomName = prompt("Enter Room Number:");
-  //   if (!roomName) return;
-  //
-  //   try {
-  //     const res = await fetch(`${backend_url}/scan/${encodeURIComponent(user.qr_hash)}/update`, {
-  //       method: "PUT",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         authorization: localStorage.getItem("authTokenAdmin"),
-  //       },
-  //       body: JSON.stringify({ roomAllot: roomName })
-  //     });
-  //
-  //     if (!res.ok) throw new Error("Failed");
-  //
-  //     alert(`Successfully assigned to Room ${roomName}!`);
-  //     setUser({ ...user, room_allot: roomName });
-  //   } catch (err) {
-  //     alert("Failed to assign room.");
-  //   }
-  // };
-
-  /* UI Render */
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col items-center py-10 px-4 font-sans text-slate-800">
       <div className="w-full max-w-md">
@@ -283,8 +244,9 @@ useEffect(() => {
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm">
             <h2 className="text-2xl font-black text-slate-900">{user.username}</h2>
-            <p className="text-sm text-slate-500 mb-6">{user.college_name || "Independent Guest"}</p>
-
+              <p className="text-sm font-bold text-slate-500">{user.role || "No Team Name Available"}</p>
+              <p className="text-sm font-semibold text-slate-500">{user.team_name || "No Team Name Available"}</p>
+            <p className="text-sm text-slate-500 mb-6">{user.college_name || "No College Listed"}</p>
             <div className="flex gap-3 mb-6">
               <button
                 onClick={() => markAttendance()}
@@ -299,9 +261,13 @@ useEffect(() => {
             {user.is_present && (
               <div className="space-y-3 pt-4 border-t border-slate-100">
                 <div className="flex items-center justify-between bg-slate-50 p-3 rounded-xl">
-                  <span className="font-semibold">Meals: {foodCount}</span>
-                  <button  className="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg font-bold">+</button>
+                  <span className="font-semibold">Meals: {user.food_count}</span>
+                  <button onClick={addFood} className="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg font-bold">+</button>
                 </div>
+                  <div className="flex items-center justify-between bg-slate-50 p-3 rounded-xl">
+                      <span className="font-semibold">Beddings: {user.bedsheet_taken ? "Taken" : "Not Taken"}</span>
+                      <button disabled={user.bedsheet_taken} onClick={addBedding} className="bg-indigo-100 disabled:bg-gray-200 disabled:text-gray-300 text-indigo-700 px-4 py-2 rounded-lg font-bold">+</button>
+                  </div>
                   <div className="flex items-center justify-between bg-slate-50 p-3 rounded-xl">
                       <span className="font-semibold">Room Alloted: {user.room_allot || "Not Alloted"}</span>
                   </div>

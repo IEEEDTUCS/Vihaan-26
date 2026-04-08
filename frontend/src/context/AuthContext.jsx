@@ -184,6 +184,52 @@ export const AuthProvider = ({ children }) => {
       return await res.json();
     } catch (error) {
       const backendMessage = error.response?.data?.message || error.response?.data?.error;
+      throw new Error(backendMessage || "Present Not Marked");
+    }
+  };
+
+  const updateUserFoodCount = async (qrHash) => {
+    try {
+      const reqBody = {
+        foodCountInc: true
+      }
+      const res = await fetch(
+          `${backend_url}/api/user/scan/${qrHash}/update`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              authorization: `Bearer ${localStorage.getItem("authTokenAdmin")}`,
+            },
+            body: JSON.stringify(reqBody)
+          },
+      );
+      return await res.json();
+    } catch (error) {
+      const backendMessage = error.response?.data?.message || error.response?.data?.error;
+      throw new Error(backendMessage || "Food Count Not Marked");
+    }
+  };
+
+  const updateUserBeddingTaken = async (qrHash) => {
+    try {
+      const reqBody = {
+        bedsheetTakenInc: true
+      }
+      const res = await fetch(
+          `${backend_url}/api/user/scan/${qrHash}/update`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              authorization: `Bearer ${localStorage.getItem("authTokenAdmin")}`,
+            },
+            body: JSON.stringify(reqBody)
+          },
+      );
+      return await res.json();
+    } catch (error) {
+      const backendMessage = error.response?.data?.message || error.response?.data?.error;
       throw new Error(backendMessage || "Invalid RSVP Code.");
     }
   };
@@ -198,6 +244,8 @@ export const AuthProvider = ({ children }) => {
     checkUserByQr,
     linkUserQr,
     markUserPresent,
+    updateUserFoodCount,
+    updateUserBeddingTaken,
     isAuthenticated: !!user || !!admin,
   };
 
