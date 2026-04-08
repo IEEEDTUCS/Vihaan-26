@@ -59,7 +59,7 @@ export default function TeamDetailsModal({ team, onClose, onSave, token }) {
     setSaving(true);
     try {
       // console.log("Saving team data:", editedTeam);
-      await onSave(editedTeam, token);
+      await onSave(editedTeam, team, token);
       onClose();
     } finally {
       setSaving(false);

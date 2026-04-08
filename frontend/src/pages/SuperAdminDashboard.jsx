@@ -4,17 +4,11 @@ import { useAuth } from "../context/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
 import ComicAlert from "../utils/ComicAlert.jsx";
 
-//-------------------------*************----****--------------
-//PLZ DONT FORGET TO UPDATE API ENDPOIINTS IN THIS FILE WHEN REAL BACKEND FUNCTIONALITIES USED HERE ARE READY
-//-------------------------*************----****--------------
-
-//----ENDPOINTS HAVE BEEN UPDATED
-
-// Import Refactored Sections
 import UsersSection from "../utils/Admin/UsersSection";
 import TeamsSection from "../utils/Admin/TeamsSection";
 
 const BACKEND = import.meta.env.VITE_BACKEND_URL_VIHAAN || "http://localhost:3000";
+
 
 // ── MAIN SUPER ADMIN DASHBOARD ────────────────────────────────────────────────
 export default function SuperAdminDashboard() {
@@ -76,40 +70,66 @@ export default function SuperAdminDashboard() {
   }, [admin, token, fetchUsers, fetchTeams]);
 
   // Save team changes
-  const handleSaveTeam = async (editedTeam, token) => {
-    console.log("Saving team data:", editedTeam);
+  const handleSaveTeam = async (editedTeam, originalTeam, token) => {
+    // console.log("Saving team data:", editedTeam);
+    console.log("token in dashboard:", token);
 
     try {
-      const updateDetailsReq = fetch(`${BACKEND}/api/admin/team/${editedTeam.team_id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          room_number: editedTeam.room_number,
-          ppt_link: editedTeam.ppt_link,
-          panel_number: editedTeam.panel_number,
-          avg_points: editedTeam.avg_points,
-          stars: editedTeam.stars,
-        }),
-      });
+      const requests = [];
 
-      const checkpointReqs = editedTeam.checkpoints.map((cp) =>
-        fetch(`${BACKEND}/api/admin/team/${editedTeam.team_id}/checkpoint`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            round_num: cp.round_num,
-            status: cp.status,
-          }),
-        })
+      //check if any team details changed
+      const detailFields = ["room_number", "ppt_link", "panel_number", "avg_points", "stars"];
+      const detailsChanged = detailFields.some(
+        (field) => String(editedTeam[field] ?? "") !== String(originalTeam[field] ?? "")
       );
 
-      const allResponses = await Promise.all([updateDetailsReq, ...checkpointReqs]);
+      if (detailsChanged) {
+        requests.push(fetch(`${BACKEND}/api/admin/team/${editedTeam._id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              room_number: editedTeam.room_number || undefined,
+              ppt_link: editedTeam.ppt_link || undefined,
+              panel_number: editedTeam.panel_number || undefined,
+              avg_points: editedTeam.avg_points !== "" ? Number(editedTeam.avg_points) : undefined,
+              stars: editedTeam.stars !== "" ? Number(editedTeam.stars) : undefined,
+            }),
+          })
+        );
+      }
+
+      //only patch the checkpoints that actually changed
+      const changedCheckpoints = editedTeam.checkpoints.filter((cp) => {
+        const original = originalTeam.checkpoints.find((o) => o.round_num === cp.round_num);
+        return !original || original.status !== cp.status;
+      });
+
+      for (const cp of changedCheckpoints) {
+        requests.push(
+          fetch(`${BACKEND}/api/admin/team/${editedTeam.team_id}/checkpoint`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              round_num: cp.round_num,
+              status: cp.status,
+            }),
+          })
+        );
+      }
+
+      //no changes made
+      if (requests.length === 0) {
+        setAlerts([{ message: `No updates detected for Team: ${editedTeam.team_name}`, severity: 0 }]);
+        return;
+      }
+
+      const allResponses = await Promise.all(requests);
 
       for (const res of allResponses) {
         if (!res.ok) {
@@ -118,7 +138,16 @@ export default function SuperAdminDashboard() {
         }
       }
 
-      setAlerts([{ message: "Team & Checkpoints updated successfully! 🎯", severity: 0 }]);
+      //dynamic messages
+      const checkpointsChanged = changedCheckpoints.length > 0;
+      const successMessage =
+        detailsChanged && checkpointsChanged
+          ? "Team details & checkpoints updated successfully"
+          : detailsChanged
+          ? "Team details updated successfully"
+          : `${changedCheckpoints.length} checkpoint${changedCheckpoints.length > 1 ? "s" : ""} updated successfully`;
+
+      setAlerts([{ message: successMessage + ` for Team: ${editedTeam.team_name}`, severity: 0 }]);
       fetchTeams();
     } catch (err) {
       setAlerts([{ message: err.message, severity: 2 }]);

@@ -1,45 +1,49 @@
 import { Router } from "express";
 import { 
-    createAdmin,
     adminLogin, 
     adminMe, 
+    createAdmin, 
+    getAllVolunteers, 
+    deleteVolunteer, 
     getAllUsers, 
     getAllTeams, 
-    updateTeamDetails, 
-    updateCheckpoint 
+    updateTeam, 
+    updateCheckpointStatus 
 } from "../controllers/admin.controller";
 import { adminAuth, createCheck, superAdminOnly } from "../middlewares/adminAuth";
 import { validate } from "../middlewares/validate";
-import { adminLoginSchema, adminRegisterSchema } from "../schemas";
+import { 
+    adminLoginSchema, 
+    adminRegisterSchema, 
+    updateTeamSchema, 
+    updateCheckpointStatusSchema 
+} from "../schemas";
 import { wrapAsync } from "../utils/wrapAsync";
 
 const router = Router();
 
-// --- Auth Routes ---
 
 //create admin 
 router.post("/create", createCheck, validate(adminRegisterSchema), wrapAsync(createAdmin));
-
 // POST /api/admin/login
 router.post("/login", validate(adminLoginSchema), wrapAsync(adminLogin));
 
-// GET /api/admin/me
+// GET /api/admin/me  (protected)
 router.get("/me", adminAuth, wrapAsync(adminMe));
 
-// --- Manage Users ---
+// Manage Admins
+router.get("/volunteers", adminAuth, superAdminOnly, wrapAsync(getAllVolunteers));
 
-// GET /api/admin/users
+router.delete("/volunteer/:id", adminAuth, superAdminOnly, wrapAsync(deleteVolunteer));
+
+// Manage Users (Dashboard Section 1)
 router.get("/users", adminAuth, superAdminOnly, wrapAsync(getAllUsers));
 
-// --- Manage Teams ---
-
-// GET /api/admin/teams
+// Manage Teams (Dashboard Section 2)
 router.get("/teams", adminAuth, superAdminOnly, wrapAsync(getAllTeams));
 
-// PUT /api/admin/team/:id
-router.put("/team/:id", adminAuth, superAdminOnly, wrapAsync(updateTeamDetails));
+router.put("/team/:id", adminAuth, superAdminOnly, validate(updateTeamSchema), wrapAsync(updateTeam));
 
-// PATCH /api/admin/team/:teamId/checkpoint
-router.patch("/team/:teamId/checkpoint", adminAuth, superAdminOnly, wrapAsync(updateCheckpoint));
+router.patch("/team/:teamId/checkpoint", adminAuth, superAdminOnly, validate(updateCheckpointStatusSchema), wrapAsync(updateCheckpointStatus));
 
 export default router;

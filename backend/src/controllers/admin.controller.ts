@@ -5,10 +5,101 @@ import { Team } from "../models/team.model";
 import { generateAdminToken } from "../utils/generateToken";
 import ExpressError from "../utils/expressError";
 
+// ─── Super Admin Functions ───────────────────────────────────────────────────
+
+export const getAllVolunteers = async (_req: Request, res: Response) => {
+    const volunteers = await Admin.find({ role: "VOLUNTEER" }).select("-password");
+    res.status(200).json({
+        success: true,
+        count: volunteers.length,
+        volunteers,
+    });
+};
+
+export const deleteVolunteer = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const volunteer = await Admin.findOneAndDelete({ _id: id, role: "VOLUNTEER" });
+    
+    if (!volunteer) {
+        throw new ExpressError(404, "Volunteer not found");
+    }
+
+    res.status(200).json({
+        success: true,
+        message: "Volunteer deleted successfully",
+    });
+};
+
+export const getAllUsers = async (_req: Request, res: Response) => {
+    const users = await User.find().sort({ createdAt: -1 });
+    res.status(200).json({
+        success: true,
+        count: users.length,
+        users,
+    });
+};
+
+export const getAllTeams = async (_req: Request, res: Response) => {
+    const teams = await Team.find().sort({ team_id: 1 });
+    res.status(200).json({
+        success: true,
+        count: teams.length,
+        teams,
+    });
+};
+
+export const updateTeam = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const updateData = req.body;
+
+    const team = await Team.findByIdAndUpdate( id, updateData, {
+        new: true,
+        runValidators: true,
+    });
+
+    if (!team) {
+        throw new ExpressError(404, "Team not found");
+    }
+
+    res.status(200).json({
+        success: true,
+        message: "Team updated successfully",
+        team,
+    });
+};
+
+export const updateCheckpointStatus = async (req: Request, res: Response) => {
+    const { teamId } = req.params;
+    const { round_num, status } = req.body;
+
+    const team = await Team.findOne({ team_id: teamId });
+    if (!team) {
+        throw new ExpressError(404, "Team not found");
+    }
+
+    const round = Number(round_num);
+    const checkpoint = team.checkpoints.find((cp) => cp.round_num === round);
+    if (!checkpoint) {
+        throw new ExpressError(400, `Round ${round_num} not found for this team`);
+    }
+
+    checkpoint.status = status;
+    await team.save();
+
+    res.status(200).json({
+        success: true,
+        message: `Round ${round_num} status updated to ${status}`,
+        checkpoint,
+    });
+};
+
+// ─── Existing Admin Functions ────────────────────────────────────────────────
+
+
 export const createAdmin = async (req: Request, res: Response) => {
     const { username, password, role } = req.body;
     const existingAdmin = await Admin.findOne({ name: username });
-    if(existingAdmin) {
+    if (existingAdmin) {
         throw new ExpressError(400, "Admin with this username already exists");
     }
 
@@ -33,7 +124,7 @@ export const createAdmin = async (req: Request, res: Response) => {
 export const adminLogin = async (req: Request, res: Response) => {
     const { username, password } = req.body;
 
-    const admin = await Admin.findOne({ name : username });
+    const admin = await Admin.findOne({ name: username });
     if (!admin) throw new ExpressError(401, "Invalid credentials");
 
     const isMatch = await admin.comparePassword(password);
@@ -63,85 +154,4 @@ export const adminMe = async (req: Request, res: Response) => {
             role: admin.role,
         },
     });
-};
-
-// --- New User & Team Implementations ---
-
-export const getAllUsers = async (req: Request, res: Response) => {
-    const users = await User.find({});
-    res.status(200).json({
-        success: true,
-        users,
-    });
-};
-
-export const getAllTeams = async (req: Request, res: Response) => {
-    const teams = await Team.find({});
-    res.status(200).json({
-        success: true,
-        teams,
-    });
-};
-
-export const updateTeamDetails = async (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
-
-        const updatedTeam = await Team.findOneAndUpdate(
-            { team_id: id }, // MUST query by team_id string
-            { $set: req.body },
-            { new: true, runValidators: true }
-        );
-
-        if (!updatedTeam) {
-            return res.status(404).json({ success: false, message: "Team not found" });
-        }
-
-        res.status(200).json({ success: true, team: updatedTeam });
-    } catch (error: any) {
-        console.error("PUT TEAM ERROR:", error.message);
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
-
-export const updateCheckpoint = async (req: Request, res: Response) => {
-    try {
-        const { teamId } = req.params; // This will be "T001"
-        const { round_num, status } = req.body;
-
-        // Ensure round_num is a number to match ICheckpoint interface
-        const rNum = typeof round_num === 'string' ? parseInt(round_num) : round_num;
-
-        //query by 'team_id'
-        //match the specific round in the array
-        const updatedTeam = await Team.findOneAndUpdate(
-            { 
-                team_id: teamId, 
-                "checkpoints.round_num": rNum 
-            },
-            { 
-                $set: { "checkpoints.$.status": status } 
-            },
-            { 
-                new: true, 
-                runValidators: true 
-            }
-        );
-
-        if (!updatedTeam) {
-            return res.status(404).json({ 
-                success: false, 
-                message: `Team with ID ${teamId} and Round ${rNum} not found.` 
-            });
-        }
-
-        res.status(200).json({
-            success: true,
-            team: updatedTeam,
-        });
-
-    } catch (error: any) {
-        console.error("UPDATE CHECKPOINT ERROR:", error.message);
-        res.status(500).json({ success: false, message: error.message });
-    }
 };
