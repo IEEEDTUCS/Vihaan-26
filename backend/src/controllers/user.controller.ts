@@ -35,7 +35,7 @@ export const userMe = async (req: Request, res: Response) => {
     const user = req.user as any;
 
     const team = await Team.findById(user.team_id).select(
-        "team_name team_id type category checkpoints room_number panel_number"
+        "team_name team_id type category checkpoints room_number panel_number avg_points stars repo_or_image_link description"
     );
 
     res.status(200).json({
