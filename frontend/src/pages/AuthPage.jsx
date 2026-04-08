@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 
-const AuthPage = () => {
+const authpage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -120,4 +120,4 @@ const AuthPage = () => {
     );
 };
 
-export default AuthPage;
+export default authpage;
