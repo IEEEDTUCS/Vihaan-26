@@ -1,9 +1,11 @@
 import { Request, Response } from "express";
 import { User } from "../models/user.model";
 import { Team } from "../models/team.model";
+import { Room } from "../models/room.model";
 import { generateUserToken } from "../utils/generateToken";
 import ExpressError from "../utils/expressError";
 import {updateTeamSchema} from "../schemas";
+import {gt} from "zod";
 
 export const userLogin = async (req: Request, res: Response) => {
     const { email, code } = req.body;
@@ -63,23 +65,36 @@ type Room = {
     availability: number;
 }
 
-function allotRoom(teamSize: number, rooms: Room[]) {
-    let bestfitroom= null;
-    let bestfitindex=-1;
+async function allotRoom(teamSize: number) {
+    // let bestfitroom= null;
+    // let bestfitindex=-1;
 
-    for(let i=0; i<rooms.length; i++) {
-        if(rooms[i].availability>=teamSize){
-            if(bestfitroom=== null || rooms[i].availability>bestfitroom.availability ){
-                bestfitroom=rooms[i];
-                bestfitindex=i;
-            }
-        }
+    const bestRoom = await Room.findOne({
+        availability: { $gte: teamSize },
+    }).sort({ availability: -1 });
+
+    if (!bestRoom) {
+        throw new ExpressError(500, "No room available");
     }
+
+    const update = await Room.findOneAndUpdate({room_number: bestRoom.room_number}, {availability: bestRoom.availability - teamSize}, {returnDocument: "after"})
+    if (!update) {
+        throw new ExpressError(500, "Room allotment failed");
+    }
+
+    // for(let i=0; i<rooms.length; i++) {
+    //     if(rooms[i].availability>=teamSize){
+    //         if(bestfitroom=== null || rooms[i].availability>bestfitroom.availability ){
+    //             bestfitroom=rooms[i];
+    //             bestfitindex=i;
+    //         }
+    //     }
+    // }
     //if(bestfitindex===-1){
       //  return no empty room available
     //}
-    rooms[bestfitindex].availability -=teamSize;
-    //return the alloted room no.
+    // rooms[bestfitindex].availability -=teamSize;
+    return update.room_number;
 }
 
 export const findUserByQrCode = async (req: Request, res: Response) => {
@@ -113,7 +128,7 @@ export const linkUserToQrCode = async (req: Request, res: Response) => {
     const {rsvpCode, qrHash} = req.body;
     if (!qrHash || !rsvpCode) throw new ExpressError(400, "qrHash and rsvpCode is required");
 
-    const user = await User.findOne({qr_hash: qrHash})
+    const user = await User.findOne({rsvp_code: rsvpCode})
     if (!user) throw new ExpressError(404, "User not found");
     const team = await Team.findOne({team_id: user.team_id})
     if (!team) throw new ExpressError(404, "User not found");
@@ -125,17 +140,17 @@ export const linkUserToQrCode = async (req: Request, res: Response) => {
         success: true,
         message: `User linked successfully. Mark Present to complete Check-in`,
         user: {
-            id: user._id,
-            username: user.username,
-            email: user.email,
-            role: user.role,
-            college_name: user.college_name,
+            id: update._id,
+            username: update.username,
+            email: update.email,
+            role: update.role,
+            college_name: update.college_name,
             team_name: team.team_name,
-            is_present: user.is_present,
-            food_count: user.food_count,
-            bedsheet_taken: user.bedsheet_taken,
+            is_present: update.is_present,
+            food_count: update.food_count,
+            bedsheet_taken: update.bedsheet_taken,
             room_allot: team.room_number,
-            qr_hash: user.qr_hash,
+            qr_hash: update.qr_hash,
         },
     })
 }
@@ -146,8 +161,18 @@ export const markUserPresent = async (req: Request, res: Response) => {
 
     const update = await User.findOneAndUpdate({qr_hash: qrHash}, {is_present: true}, {returnDocument: 'after'});
     if (!update) throw new ExpressError(404, "User not found");
-    const team = await Team.findOne({team_id: update.team_id})
-    if (!team) throw new ExpressError(404, "User not found");
+    let team = await Team.findOne({team_id: update.team_id})
+    if (!team) throw new ExpressError(404, "Team not found");
+
+    if (!team.room_number) {
+        const count = await User.countDocuments({
+            team_id: team.team_id,
+        });
+        const room = await allotRoom(count)
+
+        team = await Team.findOneAndUpdate({team_id: team.team_id}, {room_number: room}, {returnDocument: "after"})
+        if (!team) throw new ExpressError(404, "Couldn't find room");
+    }
 
     res.status(200).json({
         success: true,

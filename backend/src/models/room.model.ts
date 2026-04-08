@@ -27,7 +27,6 @@ const RoomSchema = new Schema<IRoom>(
             required: true,
             min: 0,          // cannot go negative
             default: 0,
-            index: true,     // fast filtering
         },
     },
     {
@@ -38,7 +37,6 @@ const RoomSchema = new Schema<IRoom>(
 /**
  * Indexes
  */
-RoomSchema.index({ room_number: 1 });
 RoomSchema.index({ availability: 1 });
 
 export const Room = mongoose.model<IRoom>("Room", RoomSchema);

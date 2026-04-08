@@ -170,7 +170,6 @@ export const AuthProvider = ({ children }) => {
 
   const markUserPresent = async (qrHash) => {
     try {
-      // MATCHES: router.post("/linkQr")
       const res = await fetch(
           `${backend_url}/api/user/scan/${qrHash}/present`,
           {

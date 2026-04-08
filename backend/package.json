@@ -10,7 +10,8 @@
     "test": "echo \"No tests\"",
     "dev": "nodemon --watch src --ext ts --exec \"ts-node src/main.ts\"",
     "build": "tsc",
-    "start": "node dist/main.js"
+    "start": "node dist/main.js",
+    "seedRooms": "ts-node src/scripts/seedRooms.ts"
   },
   "dependencies": {
     "@types/cors": "^2.8.19",
