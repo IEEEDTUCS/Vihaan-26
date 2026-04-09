@@ -26,23 +26,23 @@ jobs:
       # =========================
       - name: Pull latest code
         run: |
-          cd ~/Vihaan-26
+          cd /home/ubuntu/Vihaan-26
           git pull origin main
       
       # =========================
       # BACKEND DEPLOY
       # =========================
       - name: Install backend deps
-        working-directory: ~/Vihaan-26/backend
+        working-directory: /home/ubuntu/Vihaan-26/backend
         run: npm ci
       
       - name: Build backend
-        working-directory: ~/Vihaan-26/backend
+        working-directory: /home/ubuntu/Vihaan-26/backend
         run: npm run build
       
       - name: Restart backend
         run: |
-          pm2 reload vihaan-backend --update-env || pm2 start ~/Vihaan-26/backend/dist/main.js --name vihaan-backend
+          pm2 reload vihaan-backend --update-env || pm2 start /home/ubuntu/Vihaan-26/backend/dist/main.js --name vihaan-backend
           pm2 save
 
       # =========================
