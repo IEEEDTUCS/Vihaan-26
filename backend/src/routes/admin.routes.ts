@@ -8,7 +8,9 @@ import {
     getAllUsers, 
     getAllTeams, 
     updateTeam, 
-    updateCheckpointStatus 
+    updateCheckpointStatus,
+    getTeamByTeamId,
+    updatePanelNumber
 } from "../controllers/admin.controller";
 import { adminAuth, createCheck, superAdminOnly } from "../middlewares/adminAuth";
 import { validate } from "../middlewares/validate";
@@ -45,5 +47,11 @@ router.get("/teams", adminAuth, superAdminOnly, wrapAsync(getAllTeams));
 router.put("/team/:id", adminAuth, superAdminOnly, validate(updateTeamSchema), wrapAsync(updateTeam));
 
 router.patch("/team/:teamId/checkpoint", adminAuth, superAdminOnly, validate(updateCheckpointStatusSchema), wrapAsync(updateCheckpointStatus));
+
+// Search Team by Team ID
+router.get("/team/search/:teamId", adminAuth, superAdminOnly, wrapAsync(getTeamByTeamId));
+
+// Update Panel Number
+router.patch("/team/:teamId/panel", adminAuth, superAdminOnly, wrapAsync(updatePanelNumber));
 
 export default router;

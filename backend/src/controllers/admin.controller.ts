@@ -93,6 +93,36 @@ export const updateCheckpointStatus = async (req: Request, res: Response) => {
     });
 };
 
+export const getTeamByTeamId = async (req: Request, res: Response) => {
+    const { teamId } = req.params;
+    const team = await Team.findOne({ team_id: teamId });
+    if (!team) {
+        throw new ExpressError(404, "Team not found");
+    }
+    res.status(200).json({
+        success: true,
+        team,
+    });
+};
+
+export const updatePanelNumber = async (req: Request, res: Response) => {
+    const { teamId } = req.params;
+    const { panel_number } = req.body;
+    const team = await Team.findOneAndUpdate(
+        { team_id: teamId },
+        { panel_number },
+        { new: true, runValidators: true }
+    );
+    if (!team) {
+        throw new ExpressError(404, "Team not found");
+    }
+    res.status(200).json({
+        success: true,
+        message: "Panel number updated successfully",
+        team,
+    });
+};
+
 // ─── Existing Admin Functions ────────────────────────────────────────────────
 
 
