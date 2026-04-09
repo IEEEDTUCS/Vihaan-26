@@ -6,6 +6,7 @@ const backend_url = import.meta.env.VITE_BACKEND_URL_VIHAAN;
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [admin, setAdmin] = useState(null);
+  const [teamInfo, setTeamInfo] = useState(null);
   const [loading, setLoading] = useState(true);//make sure that this loading state will re render child components too which can cause some states to not get updated after the authcontext functions so preffered to use loading sepeartely
 
   useEffect(() => {
@@ -48,6 +49,14 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, []);
 
+  useEffect(() => {
+  if (user) {
+    getTeamInfo().catch(err =>
+      console.error("Failed to fetch team info:", err)
+    );
+  }
+}, [user]);
+
   const fetchMe = async (token) => {
     const res = await fetch(`${backend_url}/api/user/me`, {
       method: "GET",
@@ -62,7 +71,7 @@ export const AuthProvider = ({ children }) => {
     if (!res.ok) {
       throw new Error(data.message || "Failed to send request");
     }
-
+    
     return data.user ?? data;
   };
 
@@ -129,6 +138,26 @@ export const AuthProvider = ({ children }) => {
     setAdmin(null);
     setUser(null);
   };
+
+  const getTeamInfo = async () => {
+    const res = await fetch(`${backend_url}/api/user/team`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem("authTokenUser")}`,
+      },
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      throw new Error(data.message || "Failed to fetch team info");
+    }
+
+    setTeamInfo(data.team);
+    return data.team;
+  };
+
 
   const checkUserByQr = async (code) => {
     const res = await fetch(`${backend_url}/api/user/scan/${code}` , {
@@ -327,6 +356,7 @@ export const AuthProvider = ({ children }) => {
   const value = {
     user,
     admin,
+    teamInfo,
     loading,
     login,
     logout,

@@ -5,6 +5,8 @@ import {
     markUserPresent,
     userLogin,
     userMe,
+    userTeamInfo,
+    userRsvpCodeByEmail,
     userVolunteerUpdatePayload,
     teamLeaderProjectSubmission, fetchRoomsForUser
 } from "../controllers/user.controller";
@@ -23,9 +25,12 @@ router.post("/login", validate(userLoginSchema), wrapAsync(userLogin));
 // GET /api/user/me  (protected)
 router.get("/me", userAuth, wrapAsync(userMe));
 
+router.get("/team", userAuth, wrapAsync(userTeamInfo));
+//get users rsvp code by email for emailing
+router.get("/rsvp/:email", wrapAsync(userRsvpCodeByEmail));
 // Submission routes (leader only)
-router.post("/submit/initial", userAuth, leaderOnly, wrapAsync(submitInitial));
-router.post("/submit/checkpoint", userAuth, leaderOnly, wrapAsync(submitCheckpoint));
+router.post("/submit/initial", userAuth, leaderOnly, validate(submitRepoSchema), wrapAsync(submitInitial));
+router.post("/submit/checkpoint", userAuth, leaderOnly, validate(submitCheckpointSchema), wrapAsync(submitCheckpoint));
 
 // ── Volunteer / Admin routes ──────────────────────────────────────────────────
 router.get("/scan/:qrHash", adminAuth, wrapAsync(findUserByQrCode));

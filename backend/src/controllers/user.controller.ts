@@ -57,6 +57,37 @@ export const userMe = async (req: Request, res: Response) => {
     });
 };
 
+export const userTeamInfo = async (req: Request, res: Response) => {
+    const user = req.user as any;
+
+    const team = await Team.findOne({ team_id: user.team_id }).select(
+        "team_name team_id type category checkpoints room_number panel_number avg_points stars repo_or_image_link description"
+    );
+
+    res.status(200).json({
+        success: true,
+        team,
+    });
+};
+
+export const userRsvpCodeByEmail = async (req: Request, res: Response) => {
+    const { email } = req.params;
+    if (!email) throw new ExpressError(400, "Email is required");
+
+    const user = await User.findOne({ email });
+    if (!user) throw new ExpressError(404, "User not found");
+    res.status(200).json({
+        success: true,
+        rsvp_code: user.rsvp_code
+    });
+
+}
+
+type Room = {
+    roomNo: string;
+    availability: number;
+}
+
 async function allotRoom(teamSize: number) {
     const bestRoom = await Room.findOne({
         availability: { $gte: teamSize },
@@ -170,129 +201,65 @@ export const markUserPresent = async (req: Request, res: Response) => {
     })
 }
 
-interface UserVolunteerUpdatePayload {
+interface userVolunteerUpdatePayload {
     foodCountInc?: boolean;
-    foodCountDec?: boolean;
     roomAllot?: string;
-    bedsheetTaken?: boolean;
-    unCheckIn?: boolean;
+    bedsheetTakenInc?: boolean;
 }
 
 export const userVolunteerUpdatePayload = async (req: Request, res: Response) => {
-    const payload: UserVolunteerUpdatePayload = req.body;
+    const payload: userVolunteerUpdatePayload = req.body;
     const { qrHash } = req.params;
+    if (!payload) throw new ExpressError(400, "No data provided in body");
 
     if (!payload || Object.keys(payload).length === 0) {
         throw new ExpressError(400, "No data provided in body");
     }
 
-    if (payload.foodCountInc && payload.foodCountDec) {
-        throw new ExpressError(400, "Food count cannot be increased and decreased together");
-    }
     const updateQuery: any = {};
 
-    // Food count logic
     if (payload.foodCountInc) {
-        updateQuery.$inc = { ...(updateQuery.$inc || {}), food_count: 1 };
+        updateQuery.$set = { ...(updateQuery.$inc || {}), food_count: payload.foodCountInc };
     }
 
-    if (payload.foodCountDec) {
-        updateQuery.$inc = { ...(updateQuery.$inc || {}), food_count: -1 };
+    if (payload.bedsheetTakenInc) {
+        updateQuery.$set = { ...(updateQuery.$set || {}), bedsheet_taken: true };
     }
 
-    // Bedsheet boolean logic
-    if (payload.bedsheetTaken !== undefined) {
-        updateQuery.$set = {
-            ...(updateQuery.$set || {}),
-            bedsheet_taken: payload.bedsheetTaken,
-        };
-    }
-    if (payload.unCheckIn) {
-        updateQuery.$set = {
-            ...(updateQuery.$set || {}),
-            is_present: false,
-        }
+    if (payload.roomAllot) {
+        updateQuery.$set = { ...(updateQuery.$set || {}), room_allot: payload.roomAllot };
     }
 
-    if (Object.keys(updateQuery).length === 0 && !payload.roomAllot) {
+    if (Object.keys(updateQuery).length === 0) {
         throw new ExpressError(400, "No valid fields to update");
     }
 
-    const updatedUser = await User.findOneAndUpdate(
-        {
-            qr_hash: qrHash,
-            ...(payload.foodCountDec && { food_count: { $gt: 0 } }),
-        },
+    const update = await User.findOneAndUpdate(
+        {qr_hash: qrHash},
         updateQuery,
-        {
-            returnDocument: "after",
-            runValidators: true,
-        }
-    );
+        {returnDocument: 'after'}
+    )
 
-    if (!updatedUser) throw new ExpressError(404, "User not found or invalid decrement");
-
-    if (payload.roomAllot) {
-        const room = await Room.findOne({room_number: payload.roomAllot})
-        if (!room) throw new ExpressError(404, "Room not found");
-
-        const teamSize = await User.countDocuments({
-            team_id: updatedUser.team_id,
-        });
-
-        if (room.availability < teamSize) {
-            throw new ExpressError(400, "Room availability too low");
-        }
-
-        await Room.updateOne(
-            {room_number: room.room_number},
-            {availability: room.availability - teamSize},
-        )
-
-        await Team.updateOne(
-            { team_id: updatedUser.team_id },
-            { $set: { room_number: payload.roomAllot } }
-        );
-    }
-    const team = await Team.findOne({ team_id: updatedUser.team_id }).lean();
-    if (!team) throw new ExpressError(404, "Team not found");
+    if (!update) throw new ExpressError(404, "User not found");
+    const team = await Team.findOne({team_id: update.team_id})
+    if (!team) throw new ExpressError(404, "User not found");
 
     res.status(200).json({
         success: true,
         message: "Data updated successfully",
         user: {
-            id: updatedUser._id,
-            username: updatedUser.username,
-            email: updatedUser.email,
-            role: updatedUser.role,
+            id: update._id,
+            username: update.username,
+            email: update.email,
+            role: update.role,
             team_name: team.team_name,
-            college_name: updatedUser.college_name,
-            is_present: updatedUser.is_present,
-            food_count: updatedUser.food_count,
-            bedsheet_taken: updatedUser.bedsheet_taken,
+            college_name: update.college_name,
+            is_present: update.is_present,
+            food_count: update.food_count,
+            bedsheet_taken: update.bedsheet_taken,
             room_allot: team.room_number,
-            qr_hash: updatedUser.qr_hash,
-        },
-    });
-}
-
-export const fetchRoomsForUser = async (req: Request, res: Response) => {
-    const { qrHash } = req.params;
-    if (!qrHash) throw new ExpressError(400, "qrHash is required");
-
-    const user = await User.findOne({qr_hash: qrHash})
-    if (!user) throw new ExpressError(404, "User not found");
-    const team = await Team.findOne({team_id: user.team_id})
-    if (!team) throw new ExpressError(404, "User not found");
-
-    const teamSize = await User.countDocuments({
-        team_id: team.team_id,
-    });
-
-    const rooms = await Room.find({availability: {$gte: teamSize}})
-
-    return res.status(200).json({
-        rooms
+            qr_hash: update.qr_hash,
+        }
     })
 }
 
@@ -317,4 +284,6 @@ export const teamLeaderProjectSubmission = async (req: Request, res: Response) =
         })
     
 }
+
+
 //commit links and image-link submission (team leader) 

@@ -34,6 +34,7 @@ export const csvUserRowSchema = z.object({
     username: z.string().trim().min(1, "username is required"),
     email: z.email("Invalid email").trim().toLowerCase(),
     college_name: z.string().trim().min(1, "college_name is required"),
+    type: z.string().trim().min(1, "type is required").max(50, "type must be at most 50 characters"),
     role: z.enum(["LEADER", "MEMBER"], { error: "role must be LEADER or MEMBER" }),
 });
 
@@ -69,6 +70,9 @@ export const assignQrSchema = z.object({
 // ─── Team: Project Submission ─────────────────────────────────────────────────
 
 export const submitRepoSchema = z.object({
+    type: z.string().trim().min(1, "type is required").max(50, "type must be at most 50 characters"),
+    category: z.array(z.string().trim()).min(1, "At least one category is required").max(5, "No more than 5 categories allowed"),
+    description: z.string().trim().min(1, "description is required").max(1000, "description must be at most 1000 characters"),
     repo_link: url("repo_link must be a valid URL"),
 });
 

@@ -9,6 +9,9 @@ export const submitInitial = async (req: Request, res: Response) => {
     const user = req.user as any;
     const { type, category, description, repo_link } = req.body;
 
+    if(!type || !category || !description || !repo_link) {
+        throw new ExpressError(400, "Missing required fields");
+    }
     const team = await Team.findOne({ team_id: user.team_id });
     if (!team) throw new ExpressError(404, "Team not found");
 
@@ -24,9 +27,14 @@ export const submitInitial = async (req: Request, res: Response) => {
     let githubCheck = null;
 
     if (repo_link) {
+        //if rescloudinary link then skip
+        if (!repo_link.includes("res.cloudinary.com")){
         parseGitHubUrl(repo_link); // throws if invalid GitHub URL
         githubCheck = await checkInitialRepo(repo_link, process.env.EVENT_START as string);
         team.repo_or_image_link = repo_link;
+        }else{
+            team.repo_or_image_link = repo_link;
+        }
     }
 
     if (type) team.type = type;
