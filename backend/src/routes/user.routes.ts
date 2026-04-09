@@ -8,7 +8,8 @@ import {
     userTeamInfo,
     userRsvpCodeByEmail,
     userVolunteerUpdatePayload,
-    teamLeaderProjectSubmission, fetchRoomsForUser
+    teamLeaderProjectSubmission,
+    fetchRoomsForUser
 } from "../controllers/user.controller";
 import { submitInitial, submitCheckpoint } from "../controllers/submission.controller";
 import { userAuth, leaderOnly } from "../middlewares/userAuth";
