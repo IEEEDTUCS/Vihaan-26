@@ -12,18 +12,17 @@ export default function VolunteerDashboard() {
       decreaseUserFoodCount,
       updateUserBeddingTaken,
       unCheckInUser,
-      fetchRoomsForUser,
-      updateRoom
   } = useAuth();
 
   const [qrCode, setQrCode] = useState("");
   const [isScanning, setIsScanning] = useState(false);
   const [rsvpCode, setRsvpCode] = useState("");
-  const [rooms, setRooms] = useState([]);
-
   const [user, setUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showRSVP, setShowRSVP] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [modalContent, setModalContent] = useState(null);
+  const [modalCallBack, setModalCallBack] = useState(null);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -107,23 +106,6 @@ export default function VolunteerDashboard() {
             }
         };
     }, [isScanning, handleScan]); // Re-run effect when isScanning changes
-
-    // fetch rooms when user loads
-    useEffect(() => {
-        if (!user?.qr_hash) return;
-
-        const fetchRooms = async () => {
-            try {
-                const roomsFetch = await fetchRoomsForUser(user.qr_hash);
-                setRooms(roomsFetch);
-                console.log(roomsFetch);
-            } catch (err) {
-                console.error("Failed to fetch rooms", err);
-            }
-        };
-
-        fetchRooms();
-    }, [user?.qr_hash, fetchRoomsForUser]);
 
   const handleRSVP = async () => {
     const cleanRSVP = rsvpCode.trim(); // FIX: Prevent Mongo space errors
@@ -210,18 +192,11 @@ export default function VolunteerDashboard() {
         }
     };
 
-    const handleRoomChange = async (room) => {
-        setLoading(true);
-        setError("");
-        try {
-            const data = await updateRoom(user.qr_hash, room);
-            setUser(data.user);
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const openConfirmModal = (content, callback) => {
+        setModalContent(content);
+        setModalCallBack(() => callback);
+        setShowConfirmModal(true);
+    }
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col items-center py-10 px-4 font-sans text-slate-800">
@@ -304,6 +279,33 @@ export default function VolunteerDashboard() {
 
       </div>
 
+        { showConfirmModal && (
+
+            <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-70">
+                <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
+                    <h2 className="text-xl font-black text-slate-900">Confirm Action</h2>
+                    <p className="text-sm font-bold text-slate-500 mb-5">{modalContent}</p>
+                    <div className="flex gap-3 mb-6">
+                        <button
+                            onClick={() => setShowConfirmModal(false)}
+                            className="flex-1 py-3 rounded-xl font-bold transition-all bg-red-100 text-red-700 ring-2 ring-red-500">
+                            No
+                        </button>
+                        <button
+                            onClick={() => {
+                                modalCallBack.call()
+                                setShowConfirmModal(false)
+                            }}
+                            className="flex-1 py-3 rounded-xl font-bold transition-all bg-emerald-100 text-emerald-700 ring-2 ring-emerald-500">
+                            Yes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )
+
+        }
+
       {/* USER MODAL */}
       {showModal && user && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
@@ -315,7 +317,7 @@ export default function VolunteerDashboard() {
             <div className="flex gap-3 mb-6">
               <button
                   disabled={user.is_present}
-                onClick={() => markAttendance()}
+                onClick={() => openConfirmModal("Do you want to mark this user present?", markAttendance)}
                 className={`flex-1 py-3 rounded-xl font-bold transition-all ${
                   user.is_present ? "bg-emerald-100 text-emerald-700 ring-2 ring-emerald-500" : "bg-emerald-500 text-white"
                 }`}
@@ -323,7 +325,7 @@ export default function VolunteerDashboard() {
                 {user.is_present ? "✓ Checked In" : "Check In"}
               </button>
                 {user.is_present && (<button
-                    onClick={() => unCheckIn()}
+                    onClick={() => openConfirmModal("Do you want to mark this user absent?", unCheckIn)}
                     className={`flex-1 py-3 rounded-xl font-bold transition-all ${
                         user.is_present ? "bg-red-100 text-red-700 ring-2 ring-red-500" : "bg-red-500 text-white"
                     }`}
@@ -335,32 +337,17 @@ export default function VolunteerDashboard() {
             {user.is_present && (
               <div className="space-y-3 pt-4 border-t border-slate-100">
                 <div className="flex items-center justify-between bg-slate-50 p-3 rounded-xl">
-                    <button disabled={user.food_count === 0} onClick={reduceFood} className="bg-indigo-100 disabled:bg-gray-200 disabled:text-gray-300 text-indigo-700 px-4 py-2 rounded-lg font-bold">-</button>
+                    <button disabled={user.food_count === 0} onClick={() => openConfirmModal("Do you want to decrease food count?", reduceFood)} className="bg-indigo-100 disabled:bg-gray-200 disabled:text-gray-300 text-indigo-700 px-4 py-2 rounded-lg font-bold">-</button>
                   <span className="font-semibold">Meals: {user.food_count}</span>
-                  <button onClick={addFood} className="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg font-bold">+</button>
+                  <button onClick={() => openConfirmModal("Do you want increase food count?", addFood)} className="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg font-bold">+</button>
                 </div>
                   <div className="flex items-center justify-between bg-slate-50 p-3 rounded-xl">
-                      <button disabled={!user.bedsheet_taken} onClick={() => {updateBedding(false)}} className="bg-indigo-100 disabled:bg-gray-200 disabled:text-gray-300 text-indigo-700 px-4 py-2 rounded-lg font-bold">-</button>
+                      <button disabled={!user.bedsheet_taken} onClick={() => {openConfirmModal("Do you want to mark bedsheet as taken?", () => updateBedding(false))}} className="bg-indigo-100 disabled:bg-gray-200 disabled:text-gray-300 text-indigo-700 px-4 py-2 rounded-lg font-bold">-</button>
                       <span className="font-semibold">Beddings: {user.bedsheet_taken ? "Taken" : "Not Taken"}</span>
-                      <button disabled={user.bedsheet_taken} onClick={() => {updateBedding(true)}} className="bg-indigo-100 disabled:bg-gray-200 disabled:text-gray-300 text-indigo-700 px-4 py-2 rounded-lg font-bold">+</button>
+                      <button disabled={user.bedsheet_taken} onClick={() => {openConfirmModal("Do you want to mark bedsheet as not taken?", () => updateBedding(true))}} className="bg-indigo-100 disabled:bg-gray-200 disabled:text-gray-300 text-indigo-700 px-4 py-2 rounded-lg font-bold">+</button>
                   </div>
                   <div className="flex items-center justify-between bg-slate-50 p-3 rounded-xl">
-                      <span className="font-semibold">Room Allotted:</span>
-
-                      <select
-                          className="ml-4 p-2 rounded-lg border border-gray-300"
-                          value={user.room_allot || ""}
-                          onChange={(e) => handleRoomChange(e.target.value)}
-                      >
-                          {rooms && rooms.length > 0 ? (
-                              rooms.map((room) => (
-                                  <option key={room.room_number} value={room.room_number}>
-                                      {room.room_number}
-                                  </option>
-                              ))
-                          ) : (
-                              <option disabled>Loading rooms...</option>
-                          )}                      </select>
+                      <span className="font-semibold">Room Allotted: {user.room_allot}</span>
                   </div>              </div>
             )}
 
