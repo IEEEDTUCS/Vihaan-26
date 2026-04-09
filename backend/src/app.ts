@@ -12,7 +12,7 @@ dotenv.config();
 
 const app = express();
 
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || "")
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || "")//will allow hoppscotch with proxy meaning request goes from browser - > hoppscotch proxy - > our server, so origin will be hoppscotch's url which we have allowed
     .split(",")
     .map(origin => origin.trim())
     .filter(Boolean);
