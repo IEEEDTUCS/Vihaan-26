@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { Team } from "../models/team.model";
-import { checkInitialRepo, checkCheckpointCommit, parseGitHubUrl } from "../services/github.service";
-import { uploadImageBuffer } from "../config/cloudinary";
+import { checkInitialRepo, checkCheckpointCommit } from "../services/github.service";
+import { uploadImageToCloudinary } from "../services/cloundinar.service";
 import ExpressError from "../utils/expressError";
 
 // ── Time window helpers ───────────────────────────────────────────────────────
@@ -18,8 +18,12 @@ const windowLabel = (openKey: string, closeKey: string): string => {
     return `${fmt(process.env[openKey] as string)} – ${fmt(process.env[closeKey] as string)}`;
 };
 
+// ── Regex validators ──────────────────────────────────────────────────────────
+const GITHUB_REPO_REGEX = /^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+(\.git)?\/?$/;
+const GITHUB_COMMIT_REGEX = /^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+\/commit\/[a-f0-9]{7,40}$/;
+const CLOUDINARY_REGEX = /^https:\/\/res\.cloudinary\.com\//;
+
 // ── GET /api/user/team ────────────────────────────────────────────────────────
-// All team members can view their team's submission data
 export const getTeamSubmission = async (req: Request, res: Response) => {
     const user = req.user as any;
     const team = await Team.findOne({ team_id: user.team_id }).select(
@@ -30,7 +34,6 @@ export const getTeamSubmission = async (req: Request, res: Response) => {
 };
 
 // ── POST /api/user/submit/initial ─────────────────────────────────────────────
-// Leader only — submit type, category, description + repo link or image
 export const submitInitial = async (req: Request, res: Response) => {
     const user = req.user as any;
     const { type, category, description, repo_link } = req.body;
@@ -39,6 +42,10 @@ export const submitInitial = async (req: Request, res: Response) => {
         throw new ExpressError(403,
             `Initial submission window is ${windowLabel("INITIAL_SUBMIT_OPEN", "INITIAL_SUBMIT_CLOSE")} on April 11`
         );
+    }
+
+    if (!type || !category || !description) {
+        throw new ExpressError(400, "type, category and description are required");
     }
 
     const team = await Team.findOne({ team_id: user.team_id });
@@ -63,23 +70,28 @@ export const submitInitial = async (req: Request, res: Response) => {
 
     let githubCheck = null;
 
-    // Hardware — image upload via Cloudinary
     if (req.file) {
-        const imageUrl = await uploadImageBuffer(req.file.buffer, "vihaan26/initial");
-        team.repo_or_image_link = imageUrl;
+        // Hardware image — upload to Cloudinary
+        const result = await uploadImageToCloudinary(req.file.buffer, "vihaan26/initial");
+        team.repo_or_image_link = result.secure_url;
     } else if (repo_link) {
-        parseGitHubUrl(repo_link); // validate URL
-        githubCheck = await checkInitialRepo(repo_link, process.env.EVENT_START as string);
-        team.repo_or_image_link = repo_link;
+        if (CLOUDINARY_REGEX.test(repo_link)) {
+            // Already a Cloudinary URL (hardware image uploaded separately)
+            team.repo_or_image_link = repo_link;
+        } else if (GITHUB_REPO_REGEX.test(repo_link)) {
+            // Valid GitHub repo URL — run checks
+            githubCheck = await checkInitialRepo(repo_link, process.env.EVENT_START as string);
+            team.repo_or_image_link = repo_link;
+        } else {
+            throw new ExpressError(400, "repo_link must be a valid GitHub repo URL (https://github.com/owner/repo)");
+        }
+    } else {
+        throw new ExpressError(400, "Either a repo_link or an image file is required");
     }
 
-    if (type) team.type = type;
-    if (category) {
-        team.category = Array.isArray(category)
-            ? category
-            : category.split(",").map((c: string) => c.trim());
-    }
-    if (description) team.description = description;
+    team.type = type;
+    team.category = Array.isArray(category) ? category : category.split(",").map((c: string) => c.trim());
+    team.description = description;
 
     await team.save();
 
@@ -100,7 +112,6 @@ export const submitInitial = async (req: Request, res: Response) => {
 };
 
 // ── POST /api/user/submit/checkpoint ─────────────────────────────────────────
-// Leader only — submit commit link or image per round
 export const submitCheckpoint = async (req: Request, res: Response) => {
     const user = req.user as any;
     const { round_num, commit_link } = req.body;
@@ -139,13 +150,16 @@ export const submitCheckpoint = async (req: Request, res: Response) => {
     let githubCheck = null;
 
     if (req.file) {
-        // Image submission — upload to Cloudinary, always VERIFIED
-        const imageUrl = await uploadImageBuffer(req.file.buffer, `vihaan26/checkpoints/round${round_num}`);
-        team.checkpoints[cpIndex].submit_link = imageUrl;
+        // Image — upload to Cloudinary, always VERIFIED
+        const result = await uploadImageToCloudinary(req.file.buffer, `vihaan26/checkpoints/round${round_num}`);
+        team.checkpoints[cpIndex].submit_link = result.secure_url;
         team.checkpoints[cpIndex].submitted_at = new Date();
         team.checkpoints[cpIndex].status = "VERIFIED";
         githubCheck = { status: "VERIFIED", severity: 0, flags: [] };
     } else if (commit_link) {
+        if (!GITHUB_COMMIT_REGEX.test(commit_link)) {
+            throw new ExpressError(400, "commit_link must be a valid GitHub commit URL (https://github.com/owner/repo/commit/sha)");
+        }
         const windowStart = process.env[openKey] as string;
         const windowEnd = process.env[closeKey] as string;
         githubCheck = await checkCheckpointCommit(commit_link, windowStart, windowEnd);

@@ -57,6 +57,32 @@ export const userMe = async (req: Request, res: Response) => {
     });
 };
 
+export const userTeamInfo = async (req: Request, res: Response) => {
+    const user = req.user as any;
+
+    const team = await Team.findOne({ team_id: user.team_id }).select(
+        "team_name team_id type category checkpoints room_number panel_number avg_points stars repo_or_image_link description"
+    );
+
+    res.status(200).json({
+        success: true,
+        team,
+    });
+};
+
+export const userRsvpCodeByEmail = async (req: Request, res: Response) => {
+    const { email } = req.params;
+    if (!email) throw new ExpressError(400, "Email is required");
+
+    const user = await User.findOne({ email });
+    if (!user) throw new ExpressError(404, "User not found");
+    res.status(200).json({
+        success: true,
+        rsvp_code: user.rsvp_code
+    });
+
+}
+
 type Room = {
     roomNo: string;
     availability: number;
