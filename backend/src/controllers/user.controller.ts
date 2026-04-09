@@ -175,6 +175,7 @@ interface UserVolunteerUpdatePayload {
     foodCountDec?: boolean;
     roomAllot?: string;
     bedsheetTaken?: boolean;
+    unCheckIn?: boolean;
 }
 
 export const userVolunteerUpdatePayload = async (req: Request, res: Response) => {
@@ -205,6 +206,12 @@ export const userVolunteerUpdatePayload = async (req: Request, res: Response) =>
             ...(updateQuery.$set || {}),
             bedsheet_taken: payload.bedsheetTaken,
         };
+    }
+    if (payload.unCheckIn) {
+        updateQuery.$set = {
+            ...(updateQuery.$set || {}),
+            is_present: false,
+        }
     }
 
     if (Object.keys(updateQuery).length === 0 && !payload.roomAllot) {
