@@ -308,7 +308,7 @@ function InitialSubmissionForm({ team, token, onAlert }) {
       return;
     }
 
-    if(repoLink !== "" && !/^https?:\/\/github\.com\/.+\/.+$/.test(repoLink)) {//github link validation (basic)
+    if(!isHardware && repoLink !== "" && !/^https?:\/\/github\.com\/.+\/.+$/.test(repoLink)) {//github link validation (basic)
       onAlert({ flags: ["Please provide a valid URL for the repo link."], severity: 3 });
       setSaving(false);
       return;
