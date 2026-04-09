@@ -46,8 +46,8 @@ const handleScan = async (qrValue) => {
     }
 
    
-    if (qr.trim().length < 8) {
-      return setError("Invalid QR format: Length too short.");
+    if (qr.trim().length !== 8) {
+      return setError("Invalid QR format: Length too short. only 8 characters allowed.");
     }
 
     setLoading(true);
@@ -130,23 +130,15 @@ const handleScan = async (qrValue) => {
     const cleanRsvp = rsvpCode.trim().toUpperCase().replace(/\s+/g, '');
 
     // Basic format check (assuming RSVP codes are at least 5 chars long)
-    if (cleanRsvp.length < 5) {
-      return setError("Invalid RSVP Code format. It should be at least 5 characters.");
+    if (cleanRsvp.length !== 8) {
+      return setError("Invalid RSVP Code format. It should be exactly 8 characters.");
     }
 
     setLoading(true);
     setError("");
 
     try {
-      const res = await fetch(`${API}/link-user`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        // Backend mein cleanRsvp bhej rahe hain taaki case-sensitivity ka error na aaye
-        body: JSON.stringify({ qrHash: qrCode.trim(), rsvpCode: cleanRsvp }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Invalid RSVP Code");
+      const data = await linkUserQr(qrCode, cleanRsvp);
 
       setShowRSVP(false);
       setRsvpCode(""); 
