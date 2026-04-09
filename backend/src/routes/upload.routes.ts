@@ -32,7 +32,7 @@ const imageUpload = multer({
 });
 
 // POST /api/upload/csv  — admin only
-router.post("/csv", adminAuth, upload.single("file"), handleCSVUpload);//upload.single gives us the req.file or whatever name we choose
+// router.post("/csv", adminAuth, upload.single("file"), handleCSVUpload);//upload.single gives us the req.file or whatever name we choose
 // api/upload/image
 router.post("/image", userAuth, imageUpload.single("file"), handleImageUpload);
 export default router;
