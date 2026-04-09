@@ -17,6 +17,7 @@ export default function SuperAdminDashboard() {
   const [activeSection, setActiveSection] = useState("teams");
   const [allUsers, setAllUsers] = useState([]);
   const [allTeams, setAllTeams] = useState([]);
+  const [allRooms, setAllRooms] = useState([]); // ← NEW
   const [loading, setLoading] = useState(false);
   const [alerts, setAlerts] = useState([]);
 
@@ -25,7 +26,6 @@ export default function SuperAdminDashboard() {
 
   // Fetch all users
   const fetchUsers = useCallback(async () => {
-
     try {
       const res = await fetch(`${BACKEND}/api/admin/users`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -36,12 +36,10 @@ export default function SuperAdminDashboard() {
     } catch (err) {
       setAlerts([{ message: err.message, severity: 2 }]);
     }
-
   }, [token]);
 
   // Fetch all teams
   const fetchTeams = useCallback(async () => {
-    
     try {
       const res = await fetch(`${BACKEND}/api/admin/teams`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -52,7 +50,20 @@ export default function SuperAdminDashboard() {
     } catch (err) {
       setAlerts([{ message: err.message, severity: 2 }]);
     }
+  }, [token]);
 
+  // ── NEW: Fetch all rooms with availability ───────────────────────────────────
+  const fetchRooms = useCallback(async () => {
+    try {
+      const res = await fetch(`${BACKEND}/api/admin/rooms`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to fetch rooms");
+      setAllRooms(data.rooms || []);
+    } catch (err) {
+      setAlerts([{ message: err.message, severity: 2 }]);
+    }
   }, [token]);
 
   // Load data on mount
@@ -65,34 +76,33 @@ export default function SuperAdminDashboard() {
   useEffect(() => {
     if (admin && token) {
       setLoading(true);
-      Promise.all([fetchUsers(), fetchTeams()]).finally(() => setLoading(false));
+      Promise.all([fetchUsers(), fetchTeams(), fetchRooms()]).finally(() => setLoading(false));
     }
-  }, [admin, token, fetchUsers, fetchTeams]);
+  }, [admin, token, fetchUsers, fetchTeams, fetchRooms]);
 
   // Save team changes
   const handleSaveTeam = async (editedTeam, originalTeam, token) => {
-    // console.log("Saving team data:", editedTeam);
-    console.log("token in dashboard:", token);
+    // console.log("token in dashboard:", token);
+    console.log("edited team:", editedTeam);
 
     try {
       const requests = [];
 
-      //check if any team details changed
-      const detailFields = ["room_number", "ppt_link", "panel_number", "avg_points", "stars"];
+      const detailFields = ["room_number", "panel_number", "avg_points", "stars"];
       const detailsChanged = detailFields.some(
         (field) => String(editedTeam[field] ?? "") !== String(originalTeam[field] ?? "")
       );
 
       if (detailsChanged) {
-        requests.push(fetch(`${BACKEND}/api/admin/team/${editedTeam._id}`, {
+        requests.push(
+          fetch(`${BACKEND}/api/admin/team/${editedTeam._id}`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({
-              room_number: editedTeam.room_number || undefined,
-              ppt_link: editedTeam.ppt_link || undefined,
+              room_number: editedTeam.room_number ?? "UNASSIGNED",
               panel_number: editedTeam.panel_number || undefined,
               avg_points: editedTeam.avg_points !== "" ? Number(editedTeam.avg_points) : undefined,
               stars: editedTeam.stars !== "" ? Number(editedTeam.stars) : undefined,
@@ -101,7 +111,6 @@ export default function SuperAdminDashboard() {
         );
       }
 
-      //only patch the checkpoints that actually changed
       const changedCheckpoints = editedTeam.checkpoints.filter((cp) => {
         const original = originalTeam.checkpoints.find((o) => o.round_num === cp.round_num);
         return !original || original.status !== cp.status;
@@ -123,7 +132,6 @@ export default function SuperAdminDashboard() {
         );
       }
 
-      //no changes made
       if (requests.length === 0) {
         setAlerts([{ message: `No updates detected for Team: ${editedTeam.team_name}`, severity: 0 }]);
         return;
@@ -138,7 +146,6 @@ export default function SuperAdminDashboard() {
         }
       }
 
-      //dynamic messages
       const checkpointsChanged = changedCheckpoints.length > 0;
       const successMessage =
         detailsChanged && checkpointsChanged
@@ -148,7 +155,9 @@ export default function SuperAdminDashboard() {
           : `${changedCheckpoints.length} checkpoint${changedCheckpoints.length > 1 ? "s" : ""} updated successfully`;
 
       setAlerts([{ message: successMessage + ` for Team: ${editedTeam.team_name}`, severity: 0 }]);
-      fetchTeams();
+
+      //re-fetch both teams and rooms after a save so availability stays fresh
+      await Promise.all([fetchTeams(), fetchRooms()]);
     } catch (err) {
       setAlerts([{ message: err.message, severity: 2 }]);
     }
@@ -305,7 +314,7 @@ export default function SuperAdminDashboard() {
             {activeSection === "users" ? (
               <UsersSection allUsers={allUsers} loading={loading} />
             ) : (
-              <TeamsSection allTeams={allTeams} loading={loading} onSave={handleSaveTeam} token={token} />
+              <TeamsSection allTeams={allTeams} allRooms={allRooms} loading={loading} onSave={handleSaveTeam} token={token} />
             )}
           </motion.div>
         </div>

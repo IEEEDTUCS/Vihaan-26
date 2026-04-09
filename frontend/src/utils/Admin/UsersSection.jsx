@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import DarkSelect from "../Admin//DarkSelect";
+import * as XLSX from "xlsx";
 
 // ── USERS TABLE ───────────────────────────────────────────────────────────────
 export default function UsersSection({ allUsers, loading }) {
@@ -57,6 +58,19 @@ export default function UsersSection({ allUsers, loading }) {
 
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
 
+  const downloadExcel = () => {
+    if (allUsers.length === 0) return;
+    
+    const worksheet = XLSX.utils.json_to_sheet(allUsers);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
+
+    XLSX.writeFile(workbook, "All_Users_Data.xlsx");
+  };
+
+  const isFilterActive = searchTerm || filterPresent !== null || filterRole !== null;
+  const showDownload = !isFilterActive && allUsers.length > 0;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -68,9 +82,27 @@ export default function UsersSection({ allUsers, loading }) {
         <h2 style={{ fontFamily: "Bangers", fontSize: "2rem", color: "#9CA802", letterSpacing: "0.15em", margin: 0 }}>
           Users Directory
         </h2>
+
+        <div style={{ display: "flex", gap: "10px" }}>
+           {/* ── DOWNLOAD BUTTON ── */}
+           {showDownload && (
+            <button
+              onClick={downloadExcel}
+              style={{
+                fontFamily: "Bangers",
+                fontSize: "0.9rem",
+                color: "#000",
+                background: "#bba75d",
+                border: "none",
+                padding: "4px 12px",
+                borderRadius: "0.3rem",
+                cursor: "pointer",
+                letterSpacing: "0.05em"
+              }}>Download Excel</button>
+          )}
         
         {/* Clear Filters Button */}
-        {(searchTerm || filterPresent !== null || filterRole !== null) && (
+        {isFilterActive && (
           <button
             onClick={clearFilters}
             style={{
@@ -88,6 +120,7 @@ export default function UsersSection({ allUsers, loading }) {
             Clear All
           </button>
         )}
+        </div>
       </div>
 
       {/* Search & Filters */}

@@ -10,18 +10,265 @@ const statusColors = {
   SUSPICIOUS: "#ff4444",
 };
 
+//panel dropdown
+function PanelDropdown({ value, onChange, allRooms }) {
+  const [open, setOpen] = useState(false);
+
+  const triggerLabel = value
+    ? `Panel ${value}`
+    : "-- Select Panel --";
+
+  return (
+    <div style={{ position: "relative", width: "100%", marginTop: 6, marginBottom: 12 }}>
+      
+      {/* Trigger */}
+      <div
+        onClick={() => setOpen((o) => !o)}
+        style={{
+          width: "100%",
+          background: "rgba(255,255,255,0.05)",
+          border: "1px solid #444",
+          borderRadius: open ? "0.4rem 0.4rem 0 0" : "0.4rem",
+          padding: "8px 10px",
+          color: value ? "#fff" : "#666",
+          fontFamily: "Edu TAS Beginner, sans-serif",
+          fontSize: "0.9rem",
+          cursor: "pointer",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <span>{triggerLabel}</span>
+        <span style={{ fontSize: "0.7rem", color: "#888" }}>{open ? "▲" : "▼"}</span>
+      </div>
+
+      {/* Dropdown */}
+      {open && (
+        <div
+          style={{
+            position: "absolute",
+            top: "100%",
+            left: 0,
+            right: 0,
+            background: "#111",
+            border: "1px solid #444",
+            borderTop: "none",
+            borderRadius: "0 0 0.4rem 0.4rem",
+            zIndex: 9999,
+            maxHeight: 220,
+            overflowY: "auto",
+          }}
+        >
+          {allRooms.map((room) => {
+            const isSelected = room.room_number === value;
+
+            return (
+              <div
+                key={room.room_number}
+                onClick={() => {
+                  onChange(room.room_number);
+                  setOpen(false);
+                }}
+                style={{
+                  padding: "10px 12px",
+                  color: isSelected ? "#9CA802" : "#fff",
+                  fontFamily: "Edu TAS Beginner, sans-serif",
+                  fontSize: "0.85rem",
+                  cursor: "pointer",
+                  background: isSelected ? "rgba(156,168,2,0.1)" : "transparent",
+                  borderBottom: "1px solid #222",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.07)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = isSelected
+                    ? "rgba(156,168,2,0.1)"
+                    : "transparent";
+                }}
+              >
+                Room {room.room_number}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+//room dropdown
+//allRooms: [{ room_number: string, availability: number }]
+//currentRoomNumber: the room the team is currently assigned to 
+function RoomDropdown({ value, onChange, allRooms, currentRoomNumber }) {
+  const [open, setOpen] = useState(false);
+
+  const selectedRoom = allRooms.find((r) => r.room_number === value);
+  const triggerLabel =
+  value === "UNASSIGNED"
+    ? "No Room Assigned"
+    : selectedRoom
+    ? `Room ${selectedRoom.room_number} (${selectedRoom.availability} left)`
+    : value
+    ? `Room ${value}`
+    : "Select Room";
+
+  return (
+    <div style={{ position: "relative", width: "100%", marginTop: 6, marginBottom: 12 }}>
+      {/* Trigger */}
+      <div
+        onClick={() => setOpen((o) => !o)}
+        style={{
+          width: "100%",
+          background: "rgba(255,255,255,0.05)",
+          border: "1px solid #444",
+          borderRadius: open ? "0.4rem 0.4rem 0 0" : "0.4rem",
+          padding: "8px 10px",
+          color: value ? "#fff" : "#666",
+          fontFamily: "Edu TAS Beginner, sans-serif",
+          fontSize: "0.9rem",
+          cursor: "pointer",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          userSelect: "none",
+          boxSizing: "border-box",
+        }}
+      >
+        <span>{triggerLabel}</span>
+        <span style={{ fontSize: "0.7rem", color: "#888" }}>{open ? "▲" : "▼"}</span>
+      </div>
+
+      {/* Dropdown list */}
+      {open && (
+        <div
+          style={{
+            position: "absolute",
+            top: "100%",
+            left: 0,
+            right: 0,
+            background: "#111",
+            border: "1px solid #444",
+            borderTop: "none",
+            borderRadius: "0 0 0.4rem 0.4rem",
+            zIndex: 9999,
+            maxHeight: 220,
+            overflowY: "auto",
+          }}
+        >
+          {/* Unassign */}
+          <div
+            onClick={() => {
+              onChange("UNASSIGNED");
+              setOpen(false);
+            }}
+            style={{
+              padding: "10px 12px",
+              color: value === "UNASSIGNED" ? "#9CA802" : "#aaa",
+              fontFamily: "Edu TAS Beginner, sans-serif",
+              fontSize: "0.85rem",
+              cursor: "pointer",
+              background: value === "UNASSIGNED" ? "rgba(156,168,2,0.1)" : "transparent",
+              borderBottom: "1px solid #222",
+              fontStyle: "italic",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.07)")}
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.background = value === "UNASSIGNED" ? "rgba(156,168,2,0.1)" : "transparent")
+            }
+          >
+            Unassign Room
+          </div>
+
+          {allRooms.map((room) => {
+            const isCurrentRoom = room.room_number === currentRoomNumber;
+            const isFull = room.availability === 0 && !isCurrentRoom;
+            const isSelected = room.room_number === value;
+
+            return (
+              <div
+                key={room.room_number}
+                onClick={() => {
+                  if (isFull) return; //blocked
+                  onChange(room.room_number);
+                  setOpen(false);
+                }}
+                style={{
+                  padding: "10px 12px",
+                  color: isFull ? "#555" : isSelected ? "#9CA802" : "#fff",
+                  fontFamily: "Edu TAS Beginner, sans-serif",
+                  fontSize: "0.85rem",
+                  cursor: isFull ? "not-allowed" : "pointer",
+                  background: isSelected ? "rgba(156,168,2,0.1)" : "transparent",
+                  borderBottom: "1px solid #222",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  opacity: isFull ? 0.5 : 1,
+                }}
+                onMouseEnter={(e) => {
+                  if (!isFull) e.currentTarget.style.background = "rgba(255,255,255,0.07)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = isSelected ? "rgba(156,168,2,0.1)" : "transparent";
+                }}
+              >
+                <span>
+                  Room {room.room_number}
+                  {isCurrentRoom && (
+                    <span
+                      style={{
+                        marginLeft: 8,
+                        fontSize: "0.7rem",
+                        color: "#bba75d",
+                        fontStyle: "italic",
+                      }}
+                    >
+                      (current)
+                    </span>
+                  )}
+                </span>
+
+                {/* Right: availability badge */}
+                <span
+                  style={{
+                    fontSize: "0.75rem",
+                    padding: "2px 8px",
+                    borderRadius: "0.3rem",
+                    background: isFull
+                      ? "rgba(255,68,68,0.15)"
+                      : room.availability <= 2
+                      ? "rgba(255,140,26,0.2)"
+                      : "rgba(156,168,2,0.15)",
+                    color: isFull ? "#ff4444" : room.availability <= 2 ? "#FF8C1A" : "#9CA802",
+                    fontWeight: 600,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {isFull ? "FULL" : `${room.availability} left`}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── TEAM DETAILS MODAL ────────────────────────────────────────────────────────
-export default function TeamDetailsModal({ team, onClose, onSave, token }) {
+// allRooms: array of { room_number, availability } from backend
+export default function TeamDetailsModal({ team, onClose, onSave, token, allRooms = [] }) {
   const [editedTeam, setEditedTeam] = useState({
-  room_number: "",
-  ppt_link: "",
-  panel_number: "",
-  avg_points: 0,
-  stars: 0,
-  ...team //spreading existing team data over the defaults
-});
-  const [activeCheckpoint, setActiveCheckpoint] = useState(null);
+    room_number: team.room_number ?? "UNASSIGNED",
+    panel_number: "",
+    avg_points: 0,
+    stars: 0,
+    ...team, // spread existing team data over the defaults
+  });
   const [saving, setSaving] = useState(false);
+  const originalRoomNumber = team.room_number ?? null;
 
   const handleFieldChange = (field, value) => {
     let validatedValue = value;
@@ -29,21 +276,12 @@ export default function TeamDetailsModal({ team, onClose, onSave, token }) {
     if (field === "stars") {
       if (value === "") validatedValue = 0;
       else validatedValue = Math.max(0, Math.min(5, parseInt(value, 10) || 0));
-    }
-    else if (field === "avg_points") {
-      if (value === "") validatedValue = 0; 
+    } else if (field === "avg_points") {
+      if (value === "") validatedValue = 0;
       else validatedValue = Math.max(0, Math.min(100, parseFloat(value) || 0));
     }
-    else {
-      validatedValue = value;
-    }
 
-    // console.log(`Updating ${field} to:`, validatedValue)
-
-    setEditedTeam((prev) => ({
-      ...prev,
-      [field]: validatedValue
-    }));
+    setEditedTeam((prev) => ({ ...prev, [field]: validatedValue }));
   };
 
   const handleCheckpointStatusChange = (roundNum, newStatus) => {
@@ -58,7 +296,6 @@ export default function TeamDetailsModal({ team, onClose, onSave, token }) {
   const handleSave = async () => {
     setSaving(true);
     try {
-      // console.log("Saving team data:", editedTeam);
       await onSave(editedTeam, team, token);
       onClose();
     } finally {
@@ -78,6 +315,23 @@ export default function TeamDetailsModal({ team, onClose, onSave, token }) {
     outline: "none",
     marginTop: 6,
     marginBottom: 12,
+    boxSizing: "border-box",
+  };
+
+  const readonlyInputStyle = {
+    ...inputStyle,
+    background: "rgba(255,255,255,0.02)",
+    color: "#666",
+    cursor: "not-allowed",
+    pointerEvents: "none",
+  };
+
+  const labelStyle = {
+    fontFamily: "Bangers",
+    fontSize: "0.9rem",
+    color: "#9CA802",
+    letterSpacing: "0.1em",
+    display: "block",
   };
 
   return (
@@ -113,6 +367,7 @@ export default function TeamDetailsModal({ team, onClose, onSave, token }) {
           width: "100%",
         }}
       >
+        {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
           <h2 style={{ fontFamily: "Bangers", fontSize: "1.8rem", color: "#9CA802", letterSpacing: "0.1em" }}>
             {editedTeam.team_name}
@@ -132,72 +387,96 @@ export default function TeamDetailsModal({ team, onClose, onSave, token }) {
           </button>
         </div>
 
-        {/* Team Details */}
+        {/* ── Team Details ─────────────────────────────────────────────────── */}
         <div style={{ marginBottom: 24 }}>
           <h3 style={{ fontFamily: "Bangers", fontSize: "1.2rem", color: "#bba75d", marginBottom: 12, letterSpacing: "0.1em" }}>
             Team Details
           </h3>
+
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            {[
-              ["Team ID", "team_id", true],
-              ["Type", "type", true],
-              ["Room No.", "room_number", false],
-              ["PPT Link", "ppt_link", false],
-              ["Panel No.", "panel_number", false],
-              ["Avg Points", "avg_points", false],
-              ["Stars (1-5)", "stars", false],
-            ].map(([label, field, readonly]) => (
-              <div key={field}>
-                <label style={{ fontFamily: "Bangers", fontSize: "0.9rem", color: "#9CA802", letterSpacing: "0.1em" }}>
-                  {label}
-                </label>
-                <input
-                  type={["avg_points", "stars"].includes(field) ? "number" : "text"}
-                  value={editedTeam[field] ?? ""} // Use nullish coalescing
-                  onChange={(e) => handleFieldChange(field, e.target.value)}
-                  readOnly={readonly}
-                  style={{
-                    ...inputStyle,
-                    background: readonly ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.05)",
-                    color: readonly ? "#666" : "#fff",
-                    pointerEvents: readonly ? "none" : "auto", // Added to ensure no interaction on readonly
-                    cursor: readonly ? "not-allowed" : "text",
-                  }}
-                />
-              </div>
-            ))}
+            {/* Team ID — readonly */}
+            <div>
+              <label style={labelStyle}>Team ID</label>
+              <input type="text" value={editedTeam.team_id ?? ""} readOnly style={readonlyInputStyle} />
+            </div>
+
+            {/* Type — readonly */}
+            <div>
+              <label style={labelStyle}>Type</label>
+              <input type="text" value={editedTeam.type ?? ""} readOnly style={readonlyInputStyle} />
+            </div>
+
+            {/* ── ROOM DROPDOWN ── */}
+            <div>
+              <label style={labelStyle}>Room No.</label>
+              <RoomDropdown
+                value={editedTeam.room_number ?? null}
+                onChange={(val) => handleFieldChange("room_number", val)}
+                allRooms={allRooms}
+                currentRoomNumber={originalRoomNumber}
+              />
+            </div>
+
+            {/* Panel Number */}
+            <div>
+              <label style={labelStyle}>Panel No.</label>
+              <PanelDropdown
+                value={editedTeam.panel_number ?? ""}
+                onChange={(val) => handleFieldChange("panel_number", val)}
+                allRooms={allRooms}
+              />
+            </div>
+
+            {/* Avg Points */}
+            <div>
+              <label style={labelStyle}>Avg Points</label>
+              <input
+                type="number"
+                value={editedTeam.avg_points ?? 0}
+                onChange={(e) => handleFieldChange("avg_points", e.target.value)}
+                min={0}
+                max={100}
+                style={inputStyle}
+              />
+            </div>
+
+            {/* Stars */}
+            <div>
+              <label style={labelStyle}>Stars (1–5)</label>
+              <input
+                type="number"
+                value={editedTeam.stars ?? 0}
+                onChange={(e) => handleFieldChange("stars", e.target.value)}
+                min={0}
+                max={5}
+                style={inputStyle}
+              />
+            </div>
           </div>
 
-          <label style={{ fontFamily: "Bangers", fontSize: "0.9rem", color: "#9CA802", letterSpacing: "0.1em", display: "block", marginTop: 12 }}>
-            Repo/Image Link
-          </label>
+          {/* Repo / Image Link — readonly */}
+          <label style={{ ...labelStyle, marginTop: 12 }}>Repo / Image Link</label>
           <input
             type="url"
             value={editedTeam.repo_or_image_link || ""}
-            onChange={(e) => handleFieldChange("repo_or_image_link", e.target.value)}
             readOnly
-            style={{ ...inputStyle, background: "rgba(255,255,255,0.02)", color: "#666", cursor: "not-allowed" }}
+            style={readonlyInputStyle}
           />
 
-          <label style={{ fontFamily: "Bangers", fontSize: "0.9rem", color: "#9CA802", letterSpacing: "0.1em", display: "block" }}>
-            Description
-          </label>
+          {/* Description — readonly */}
+          <label style={labelStyle}>Description</label>
           <textarea
             value={editedTeam.description || ""}
-            onChange={(e) => handleFieldChange("description", e.target.value)}
             readOnly
             style={{
-              ...inputStyle,
+              ...readonlyInputStyle,
               resize: "vertical",
               minHeight: 80,
-              background: "rgba(255,255,255,0.02)",
-              color: "#666",
-              cursor: "not-allowed",
             }}
           />
         </div>
 
-        {/* Checkpoints */}
+        {/* ── Checkpoints ──────────────────────────────────────────────────── */}
         <div style={{ marginBottom: 24 }}>
           <h3 style={{ fontFamily: "Bangers", fontSize: "1.2rem", color: "#bba75d", marginBottom: 12, letterSpacing: "0.1em" }}>
             Checkpoints
@@ -218,19 +497,17 @@ export default function TeamDetailsModal({ team, onClose, onSave, token }) {
                   Round {cp.round_num}
                 </span>
                 <span style={{ fontFamily: "Edu TAS Beginner, sans-serif", fontSize: "0.75rem", color: "#888" }}>
-                  {cp.checkpoint_time ? (
-                    new Date(cp.checkpoint_time).toLocaleString("en-IN", {
-                      timeZone: "Asia/Kolkata",
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      hour12: true,
-                    })
-                  ) : (
-                    "No Date Provided"
-                  )}
+                  {cp.checkpoint_time
+                    ? new Date(cp.checkpoint_time).toLocaleString("en-IN", {
+                        timeZone: "Asia/Kolkata",
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: true,
+                      })
+                    : "No Date Provided"}
                 </span>
               </div>
               {cp.submit_link && (
@@ -264,7 +541,7 @@ export default function TeamDetailsModal({ team, onClose, onSave, token }) {
           ))}
         </div>
 
-        {/* Save/Cancel Buttons */}
+        {/* ── Save / Cancel ─────────────────────────────────────────────────── */}
         <div style={{ display: "flex", gap: 10 }}>
           <button
             onClick={handleSave}

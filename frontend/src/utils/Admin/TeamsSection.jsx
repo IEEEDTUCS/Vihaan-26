@@ -3,9 +3,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import Badge from "../Admin/Badge";
 import DarkSelect from "../Admin/DarkSelect";
 import TeamDetailsModal from "../Admin/TeamDetailsModal";
+import * as XLSX from "xlsx";
 
 // ── TEAMS SECTION ─────────────────────────────────────────────────────────────
-export default function TeamsSection({ allTeams, loading, onSave, token }) {
+export default function TeamsSection({ allTeams, allRooms, loading, onSave, token }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState(null);
   const [filterCategory, setFilterCategory] = useState(null);
@@ -68,6 +69,24 @@ export default function TeamsSection({ allTeams, loading, onSave, token }) {
 
   const totalPages = Math.ceil(sortedTeams.length / itemsPerPage);
 
+  const downloadExcel = () => {
+    if (allTeams.length === 0) return;
+
+    const dataToExport = allTeams.map(team => ({
+      ...team,
+      category: team.category?.join(", "), // Convert array to string for Excel
+      checkpoints: team.checkpoints?.map(cp => `${cp.round_num}:${cp.status}`).join(" | ")
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Teams");
+    XLSX.writeFile(workbook, "All_Teams_Data.xlsx");
+  };
+
+  const isFilterActive = searchTerm || filterType || filterCategory || sortBy !== "team_name";
+  const showDownload = !isFilterActive && allTeams.length > 0;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -80,8 +99,26 @@ export default function TeamsSection({ allTeams, loading, onSave, token }) {
           Teams Management
         </h2>
 
+        <div style={{ display: "flex", gap: "10px" }}>
+           {/* ── DOWNLOAD BUTTON ── */}
+           {showDownload && (
+            <button
+              onClick={downloadExcel}
+              style={{
+                fontFamily: "Bangers",
+                fontSize: "0.9rem",
+                color: "#000",
+                background: "#bba75d",
+                border: "none",
+                padding: "4px 12px",
+                borderRadius: "0.3rem",
+                cursor: "pointer",
+                letterSpacing: "0.05em"
+              }}>Download Excel</button>
+          )}
+
         {/* Clear Filters Button */}
-        {(searchTerm || filterType || filterCategory || sortBy !== "team_name") && (
+        {isFilterActive && (
           <button
             onClick={clearFilters}
             style={{
@@ -99,6 +136,7 @@ export default function TeamsSection({ allTeams, loading, onSave, token }) {
             Reset All
           </button>
         )}
+        </div>
       </div>
 
       {/* Search & Filters */}
@@ -317,6 +355,7 @@ export default function TeamsSection({ allTeams, loading, onSave, token }) {
             onClose={() => setSelectedTeam(null)}
             onSave={onSave}
             token={token}
+            allRooms={allRooms}
           />
         )}
       </AnimatePresence>
