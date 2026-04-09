@@ -37,19 +37,27 @@ export default function VolunteerDashboard() {
     setShowModal(true);
   };
 
-  const handleScan = async (qrValue) => {
-    const qr = (qrValue || qrCode).trim();
-    if (!qr) return setError("Please enter or scan a QR code.");
-    if (qr.length !== 8) return setError("QR code must be exactly 8 characters.");
+const handleScan = async (qrValue) => {
+    const qr = qrValue || qrCode;
+    
+    // --- 1. QR CODE FRONTEND CHECK ---
+    if (!qr || qr.trim() === "") {
+      return setError("Please scan the qr code properly.");
+    }
+
+   
+    if (qr.trim().length < 8) {
+      return setError("Invalid QR format: Length too short.");
+    }
 
     setLoading(true);
     setError("");
-    setShowRSVP(false);
+    setShowRSVP(false); // Reset RSVP view on new scan
 
     try {
-      const data = await checkUserByQr(qr);
-      if (data && data.user) {
-        openUser(data.user);
+      const userData = await checkUserByQr(qr.trim());
+      if (userData && userData.user) {
+        openUser(userData.user);
       } else {
         setShowRSVP(true);
       }
@@ -107,18 +115,39 @@ export default function VolunteerDashboard() {
         };
     }, [isScanning, handleScan]); // Re-run effect when isScanning changes
 
-  const handleRSVP = async () => {
-    const cleanRSVP = rsvpCode.trim(); // FIX: Prevent Mongo space errors
-    const cleanQR = qrCode.trim();
+ const handleRSVP = async () => {
+    // --- 1. QR HASH CHECK ---
+    if (!qrCode || qrCode.trim() === "") {
+      return setError("QR Hash missing hai! Please scan the badge again.");
+    }
 
-    if (!cleanRSVP) return setError("Please enter an RSVP code.");
-    if (!cleanQR) return setError("Missing QR Code.");
+    // --- 2. RSVP CODE FRONTEND CHECK ---
+    if (!rsvpCode || rsvpCode.trim() === "") {
+      return setError("Please enter an RSVP code.");
+    }
+
+    // Clean the code: remove spaces and make uppercase (e.g. " vihaan 123 " -> "VIHAAN123")
+    const cleanRsvp = rsvpCode.trim().toUpperCase().replace(/\s+/g, '');
+
+    // Basic format check (assuming RSVP codes are at least 5 chars long)
+    if (cleanRsvp.length < 5) {
+      return setError("Invalid RSVP Code format. It should be at least 5 characters.");
+    }
 
     setLoading(true);
     setError("");
 
     try {
-      const data = await linkUserQr(cleanQR, cleanRSVP);
+      const res = await fetch(`${API}/link-user`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        // Backend mein cleanRsvp bhej rahe hain taaki case-sensitivity ka error na aaye
+        body: JSON.stringify({ qrHash: qrCode.trim(), rsvpCode: cleanRsvp }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Invalid RSVP Code");
+
       setShowRSVP(false);
       setRsvpCode(""); 
       openUser(data.user);
