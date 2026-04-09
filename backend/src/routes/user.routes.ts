@@ -8,7 +8,8 @@ import {
     userTeamInfo,
     userRsvpCodeByEmail,
     userVolunteerUpdatePayload,
-    teamLeaderProjectSubmission
+    teamLeaderProjectSubmission,
+    fetchRoomsForUser
 } from "../controllers/user.controller";
 import { submitInitial, submitCheckpoint } from "../controllers/submission.controller";
 import { userAuth, leaderOnly } from "../middlewares/userAuth";
@@ -37,6 +38,7 @@ router.get("/scan/:qrHash", adminAuth, wrapAsync(findUserByQrCode));
 router.post("/linkQr", adminAuth, wrapAsync(linkUserToQrCode));
 router.post("/scan/:qrHash/present", adminAuth, wrapAsync(markUserPresent));
 router.put("/scan/:qrHash/update", adminAuth, wrapAsync(userVolunteerUpdatePayload));
+router.get("/scan/:qrHash/rooms", adminAuth, wrapAsync(fetchRoomsForUser));
 
 router.put("/submitLink", userAuth, leaderOnly, wrapAsync(teamLeaderProjectSubmission));
 
