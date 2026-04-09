@@ -1,30 +1,74 @@
 import { Request, Response } from "express";
 import { Team } from "../models/team.model";
 import { checkInitialRepo, checkCheckpointCommit, parseGitHubUrl } from "../services/github.service";
+import { uploadImageBuffer } from "../config/cloudinary";
 import ExpressError from "../utils/expressError";
 
-// POST /api/user/submit/initial 
-// Leader submits: type, category, description, repo_link OR image (hardware)
+// ── Time window helpers ───────────────────────────────────────────────────────
+const isInWindow = (openKey: string, closeKey: string): boolean => {
+    const now = Date.now();
+    return now >= new Date(process.env[openKey] as string).getTime() &&
+           now <= new Date(process.env[closeKey] as string).getTime();
+};
+
+const windowLabel = (openKey: string, closeKey: string): string => {
+    const fmt = (iso: string) => new Date(iso).toLocaleTimeString("en-IN", {
+        timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: true,
+    });
+    return `${fmt(process.env[openKey] as string)} – ${fmt(process.env[closeKey] as string)}`;
+};
+
+// ── GET /api/user/team ────────────────────────────────────────────────────────
+// All team members can view their team's submission data
+export const getTeamSubmission = async (req: Request, res: Response) => {
+    const user = req.user as any;
+    const team = await Team.findOne({ team_id: user.team_id }).select(
+        "team_id team_name type category description repo_or_image_link checkpoints room_number panel_number avg_points stars"
+    );
+    if (!team) throw new ExpressError(404, "Team not found");
+    res.status(200).json({ success: true, team });
+};
+
+// ── POST /api/user/submit/initial ─────────────────────────────────────────────
+// Leader only — submit type, category, description + repo link or image
 export const submitInitial = async (req: Request, res: Response) => {
     const user = req.user as any;
     const { type, category, description, repo_link } = req.body;
 
+    if (!isInWindow("INITIAL_SUBMIT_OPEN", "INITIAL_SUBMIT_CLOSE")) {
+        throw new ExpressError(403,
+            `Initial submission window is ${windowLabel("INITIAL_SUBMIT_OPEN", "INITIAL_SUBMIT_CLOSE")} on April 11`
+        );
+    }
+
     const team = await Team.findOne({ team_id: user.team_id });
     if (!team) throw new ExpressError(404, "Team not found");
 
-    // initial submission window (2–3 PM day 1)
-    const now = Date.now();
-    const windowOpen = new Date(process.env.INITIAL_SUBMIT_OPEN as string).getTime();
-    const windowClose = new Date(process.env.INITIAL_SUBMIT_CLOSE as string).getTime();
-    if (now < windowOpen || now > windowClose) {
-        const fmt = (t: number) => new Date(t).toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: true });
-        throw new ExpressError(403, `Initial submission is only allowed between ${fmt(windowOpen)} and ${fmt(windowClose)} on April 11`);
+    // Already submitted — return existing data
+    if (team.repo_or_image_link || team.description) {
+        return res.status(200).json({
+            success: true,
+            alreadySubmitted: true,
+            message: "Initial submission already done",
+            team: {
+                team_id: team.team_id,
+                team_name: team.team_name,
+                type: team.type,
+                category: team.category,
+                description: team.description,
+                repo_or_image_link: team.repo_or_image_link,
+            },
+        });
     }
 
     let githubCheck = null;
 
-    if (repo_link) {
-        parseGitHubUrl(repo_link); // throws if invalid GitHub URL
+    // Hardware — image upload via Cloudinary
+    if (req.file) {
+        const imageUrl = await uploadImageBuffer(req.file.buffer, "vihaan26/initial");
+        team.repo_or_image_link = imageUrl;
+    } else if (repo_link) {
+        parseGitHubUrl(repo_link); // validate URL
         githubCheck = await checkInitialRepo(repo_link, process.env.EVENT_START as string);
         team.repo_or_image_link = repo_link;
     }
@@ -41,6 +85,7 @@ export const submitInitial = async (req: Request, res: Response) => {
 
     res.status(200).json({
         success: true,
+        alreadySubmitted: false,
         message: "Initial submission saved",
         githubCheck,
         team: {
@@ -54,8 +99,8 @@ export const submitInitial = async (req: Request, res: Response) => {
     });
 };
 
-// POST /api/user/submit/checkpoint
-// Leader submits commit link or image 
+// ── POST /api/user/submit/checkpoint ─────────────────────────────────────────
+// Leader only — submit commit link or image per round
 export const submitCheckpoint = async (req: Request, res: Response) => {
     const user = req.user as any;
     const { round_num, commit_link } = req.body;
@@ -64,7 +109,16 @@ export const submitCheckpoint = async (req: Request, res: Response) => {
         throw new ExpressError(400, "round_num must be between 1 and 4");
     }
 
-    const team = await Team.findById(user.team_id);
+    const openKey = `CP${round_num}_OPEN`;
+    const closeKey = `CP${round_num}_CLOSE`;
+
+    if (!isInWindow(openKey, closeKey)) {
+        throw new ExpressError(403,
+            `Checkpoint ${round_num} window is ${windowLabel(openKey, closeKey)}`
+        );
+    }
+
+    const team = await Team.findOne({ team_id: user.team_id });
     if (!team) throw new ExpressError(404, "Team not found");
 
     const cpIndex = team.checkpoints.findIndex((c) => c.round_num === round_num);
@@ -72,23 +126,34 @@ export const submitCheckpoint = async (req: Request, res: Response) => {
 
     const cp = team.checkpoints[cpIndex];
 
-    // checkpoint_time ± 30 min
-    const cpTime = new Date(cp.checkpoint_time).getTime();
-    const windowStart = new Date(cpTime - 30 * 60 * 1000).toISOString();
-    const windowEnd = new Date(cpTime + 30 * 60 * 1000).toISOString();
+    // Already submitted — return existing data
+    if (cp.submit_link || cp.submitted_at) {
+        return res.status(200).json({
+            success: true,
+            alreadySubmitted: true,
+            message: `Checkpoint ${round_num} already submitted`,
+            checkpoint: cp,
+        });
+    }
 
     let githubCheck = null;
 
-    if (commit_link) {
-        githubCheck = await checkCheckpointCommit(commit_link, windowStart, windowEnd);
-        team.checkpoints[cpIndex].submit_link = commit_link;
-        team.checkpoints[cpIndex].submitted_at = new Date();
-        team.checkpoints[cpIndex].status = githubCheck.status as "VERIFIED" | "FLAGGED" | "SUSPICIOUS";
-    } else {
-        // Image submission — always VERIFIED
+    if (req.file) {
+        // Image submission — upload to Cloudinary, always VERIFIED
+        const imageUrl = await uploadImageBuffer(req.file.buffer, `vihaan26/checkpoints/round${round_num}`);
+        team.checkpoints[cpIndex].submit_link = imageUrl;
         team.checkpoints[cpIndex].submitted_at = new Date();
         team.checkpoints[cpIndex].status = "VERIFIED";
         githubCheck = { status: "VERIFIED", severity: 0, flags: [] };
+    } else if (commit_link) {
+        const windowStart = process.env[openKey] as string;
+        const windowEnd = process.env[closeKey] as string;
+        githubCheck = await checkCheckpointCommit(commit_link, windowStart, windowEnd);
+        team.checkpoints[cpIndex].submit_link = commit_link;
+        team.checkpoints[cpIndex].submitted_at = new Date();
+        team.checkpoints[cpIndex].status = githubCheck.status as "VERIFIED" | "SUSPICIOUS";
+    } else {
+        throw new ExpressError(400, "Either commit_link or image file is required");
     }
 
     team.markModified("checkpoints");
@@ -96,6 +161,7 @@ export const submitCheckpoint = async (req: Request, res: Response) => {
 
     res.status(200).json({
         success: true,
+        alreadySubmitted: false,
         message: `Checkpoint ${round_num} submitted`,
         githubCheck,
         checkpoint: team.checkpoints[cpIndex],
