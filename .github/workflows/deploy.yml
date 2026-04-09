@@ -21,33 +21,28 @@ jobs:
           if [ -f ~/Vihaan-26/backend/.env ]; then
             cp ~/Vihaan-26/backend/.env /tmp/backend_env
           fi
-
       # =========================
       # GET LATEST CODE
       # =========================
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Restore backend .env
+      - name: Pull latest code
         run: |
-          if [ -f /tmp/backend_env ]; then
-            cp /tmp/backend_env backend/.env
-          fi
-
+          cd /home/ubuntu/Vihaan-26
+          git pull origin main
+      
       # =========================
       # BACKEND DEPLOY
       # =========================
       - name: Install backend deps
-        working-directory: backend
+        working-directory: /home/ubuntu/Vihaan-26/backend
         run: npm ci
-
+      
       - name: Build backend
-        working-directory: backend
+        working-directory: /home/ubuntu/Vihaan-26/backend
         run: npm run build
-
+      
       - name: Restart backend
         run: |
-          pm2 reload vihaan-backend --update-env || pm2 start backend/dist/main.js --name vihaan-backend
+          pm2 reload vihaan-backend --update-env || pm2 start /home/ubuntu/Vihaan-26/backend/dist/main.js --name vihaan-backend
           pm2 save
 
       # =========================

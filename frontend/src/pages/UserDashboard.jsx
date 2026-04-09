@@ -135,7 +135,7 @@ function CheckpointRow({ cp, token, onAlert }) {
 
 // ── Main Dashboard ────────────────────────────────────────────────────────────
 export default function UserDashboard() {
-  const { user, admin, logout, loading } = useAuth();
+  const { user, admin, logout, loading, teamInfo } = useAuth();
   const navigate = useNavigate();
   const [alerts, setAlerts] = useState([]);
 
@@ -157,7 +157,8 @@ export default function UserDashboard() {
   if (!user && !admin) { navigate("/login"); return null; }
 
   const activeUser = user;
-  const team = activeUser?.team || null;
+  const team = teamInfo;
+
   const checkpoints = team?.checkpoints || [];
 
   return (
@@ -216,7 +217,7 @@ export default function UserDashboard() {
         </motion.p>
 
         {/* Section 1 */}
-        <Section title="01 · Initial Submission" borderColor="#9CA802" bgColor="rgba(156,168,2,0.08)" textColor="#c8d400" defaultOpen={activeUser?.role === "LEADER"}>
+        <Section title="01 · Initial Submission" borderColor="#9CA802" bgColor="rgba(156,168,2,0.08)" textColor="#c8d400" defaultOpen={false}>
           {activeUser?.role !== "LEADER"
             ? <p style={{ fontFamily: "Edu TAS Beginner, sans-serif", color: "#888", fontSize: "1rem" }}>Only the team leader can access this section.</p>
             : <InitialSubmissionForm team={team} token={localStorage.getItem("authTokenUser")} onAlert={showAlerts} />
@@ -282,6 +283,8 @@ function InitialSubmissionForm({ team, token, onAlert }) {
   const [repoLink, setRepoLink] = useState(team?.repo_or_image_link || "");
   const [description, setDescription] = useState(team?.description || "");
   const [type, setType] = useState(team?.type || "");
+  const [imageFile, setImageFile] = useState(null);
+  const [imageLink, setImageLink] = useState(team?.repo_or_image_link || ""); // For displaying existing image link if type is hardware
   const [category, setCategory] = useState(team?.category?.join(", ") || "");
   const [saving, setSaving] = useState(false);
   const isHardware = type === "HARDWARE";
@@ -292,14 +295,73 @@ function InitialSubmissionForm({ team, token, onAlert }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
+
+    if(!type || !category || !description) {
+      onAlert({ flags: ["Please fill in all required fields."], severity: 3 });
+      setSaving(false);
+      return;
+    }
+
+    if(!isHardware && !repoLink) {
+      onAlert({ flags: ["Please provide a repo link for software projects."], severity: 3 });
+      setSaving(false);
+      return;
+    }
+
+    if(!isHardware && repoLink !== "" && !/^https?:\/\/github\.com\/.+\/.+$/.test(repoLink)) {//github link validation (basic)
+      onAlert({ flags: ["Please provide a valid URL for the repo link."], severity: 3 });
+      setSaving(false);
+      return;
+    }
+
+    if(isHardware && imageFile) {
+      if(imageFile.size > 400 * 1024) {
+        onAlert({ flags: ["Image size should be less than 400 KB."], severity: 3 });
+        setSaving(false);
+        return;
+      }
+    }
+
     try {
+      if (isHardware && imageFile) {
+        const formData = new FormData();
+        formData.append("file", imageFile); //always send file name too that multer expects
+
+        const res = await fetch(`${BACKEND}/api/upload/image`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`, 
+          },
+          body: formData,
+        });
+
+        if (!res.ok) throw new Error("Image upload failed");
+
+        const imageData = await res.json();
+        setImageLink(imageData.url);
+      }
+
+      const categoryArray = category
+      .split(",")
+      .map((c) => c.trim())
+      .filter(Boolean);
+
+      if (categoryArray.length > 5) {
+        onAlert({
+          flags: ["Maximum 5 categories allowed"],
+          severity: 3,
+        });
+        return;
+      }
+
       const res = await fetch(`${BACKEND}/api/user/submit/initial`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ type, category, description, repo_link: isHardware ? undefined : repoLink }),
+        body: JSON.stringify({ type, category: categoryArray, description, repo_link: isHardware ? imageLink : repoLink }),
       });
-      const data = await res.json();
+      
       if (!res.ok) throw new Error(data.error || "Submission failed");
+      const data = await res.json();
       if (data.githubCheck) onAlert(data.githubCheck);
       else onAlert({ flags: ["Submission saved successfully"], severity: 0 });
     } catch (err) {
@@ -321,11 +383,47 @@ function InitialSubmissionForm({ team, token, onAlert }) {
       <textarea rows={3} placeholder="Brief description of your project..." value={description} onChange={(e) => setDescription(e.target.value)} style={{ ...inputStyle, resize: "vertical" }} />
 
       {isHardware ? (
-        <>
-          <label style={labelStyle}>Project Image (Hardware)</label>
-          <input type="file" accept="image/*" style={{ ...inputStyle, padding: "6px" }} />
-          <p style={{ fontFamily: "Edu TAS Beginner, sans-serif", color: "#888", fontSize: "0.8rem", marginTop: -10, marginBottom: 14 }}>Keep image between 300–400 KB.</p>
-        </>
+          <>
+            <label style={labelStyle}>Project Image (Hardware)</label>
+
+        {/* Upload input */}
+        <input
+          type="file"
+          accept="image/*"
+          style={{ ...inputStyle, padding: "6px" }}
+          onChange={(e) => {
+            const file = e.target.files[0];
+            setImageFile(file);
+
+            // local preview before upload
+            if (file) {
+              const previewUrl = URL.createObjectURL(file);
+              setImageLink(previewUrl);
+            }
+          }}
+        />
+
+        <p style={{ fontSize: "0.8rem", color: "#888" }}>
+          Keep image between 300–400 KB.
+        </p>
+
+        {/* 🔥 Preview */}
+        {imageLink && (
+          <div style={{ marginTop: "10px" }}>
+            <img
+              src={imageLink}
+              alt="Preview"
+              style={{
+                width: "100%",
+                maxHeight: "200px",
+                objectFit: "cover",
+                borderRadius: "0.5rem",
+                border: "1px solid #444",
+              }}
+            />
+          </div>
+        )}
+      </>
       ) : (
         <>
           <label style={labelStyle}>Repo Link</label>

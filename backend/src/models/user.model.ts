@@ -75,7 +75,6 @@ const UserSchema = new Schema<IUser>(
         qr_hash: {
             type: String,
             unique: true,
-            default: null,
             sparse: true, // Allow multiple null values
         },
 

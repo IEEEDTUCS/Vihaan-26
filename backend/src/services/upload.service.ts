@@ -77,6 +77,7 @@ export const uploadCSV = async (buffer: Buffer) => {
             username: raw["Candidate's Name"] ?? raw["Name"] ?? "",
             email: raw["Candidate's Email"] ?? raw["Email"] ?? "",
             college_name: raw["Candidate's Organisation"] ?? raw["College Name"] ?? "",
+            type: raw["Team Type"] ?? "",
             role: normalizedRole,
         };
 
@@ -90,13 +91,13 @@ export const uploadCSV = async (buffer: Buffer) => {
             continue;
         }
 
-        const { team_id, team_name, username, email, college_name, role } = parsed.data;
+        const { team_id, team_name, username, email, college_name, type, role } = parsed.data;
 
         try {
             // Upsert team
             let team = await Team.findOne({ team_id });
             if (!team) {
-                team = await Team.create({ team_id, team_name });
+                team = await Team.create({ team_id, team_name, type });
             }
 
             // Skip duplicate email
@@ -114,6 +115,7 @@ export const uploadCSV = async (buffer: Buffer) => {
                 college_name,
                 rsvp_code: generateRSVP(email),
                 role,
+                qr_hash: undefined
             });
 
             created++;

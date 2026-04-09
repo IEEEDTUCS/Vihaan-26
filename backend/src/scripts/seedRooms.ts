@@ -8,7 +8,7 @@ const roomsData = [
     { room: "104", availability: 50 },
     { room: "105", availability: 50 },
     { room: "116", availability: 50 },
-    { room: "201", availability: 70 },
+    { room: "201", availability: 90 },
     { room: "204", availability: 30 },
     { room: "203", availability: 50 },
     { room: "205", availability: 50 },
