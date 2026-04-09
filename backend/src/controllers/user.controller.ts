@@ -57,15 +57,7 @@ export const userMe = async (req: Request, res: Response) => {
     });
 };
 
-type Room = {
-    roomNo: string;
-    availability: number;
-}
-
 async function allotRoom(teamSize: number) {
-    // let bestfitroom= null;
-    // let bestfitindex=-1;
-
     const bestRoom = await Room.findOne({
         availability: { $gte: teamSize },
     }).sort({ availability: -1 });
@@ -79,18 +71,6 @@ async function allotRoom(teamSize: number) {
         throw new ExpressError(500, "Room allotment failed");
     }
 
-    // for(let i=0; i<rooms.length; i++) {
-    //     if(rooms[i].availability>=teamSize){
-    //         if(bestfitroom=== null || rooms[i].availability>bestfitroom.availability ){
-    //             bestfitroom=rooms[i];
-    //             bestfitindex=i;
-    //         }
-    //     }
-    // }
-    //if(bestfitindex===-1){
-      //  return no empty room available
-    //}
-    // rooms[bestfitindex].availability -=teamSize;
     return update.room_number;
 }
 
@@ -190,66 +170,87 @@ export const markUserPresent = async (req: Request, res: Response) => {
     })
 }
 
-interface userVolunteerUpdatePayload {
+interface UserVolunteerUpdatePayload {
     foodCountInc?: boolean;
+    foodCountDec?: boolean;
     roomAllot?: string;
-    bedsheetTakenInc?: boolean;
+    bedsheetTaken?: boolean;
 }
 
 export const userVolunteerUpdatePayload = async (req: Request, res: Response) => {
-    const payload: userVolunteerUpdatePayload = req.body;
+    const payload: UserVolunteerUpdatePayload = req.body;
     const { qrHash } = req.params;
-    if (!payload) throw new ExpressError(400, "No data provided in body");
 
     if (!payload || Object.keys(payload).length === 0) {
         throw new ExpressError(400, "No data provided in body");
     }
 
+    if (payload.foodCountInc && payload.foodCountDec) {
+        throw new ExpressError(400, "Food count cannot be increased and decreased together");
+    }
     const updateQuery: any = {};
 
+    // Food count logic
     if (payload.foodCountInc) {
-        updateQuery.$set = { ...(updateQuery.$inc || {}), food_count: payload.foodCountInc };
+        updateQuery.$inc = { ...(updateQuery.$inc || {}), food_count: 1 };
     }
 
-    if (payload.bedsheetTakenInc) {
-        updateQuery.$set = { ...(updateQuery.$set || {}), bedsheet_taken: true };
+    if (payload.foodCountDec) {
+        updateQuery.$inc = { ...(updateQuery.$inc || {}), food_count: -1 };
     }
 
-    if (payload.roomAllot) {
-        updateQuery.$set = { ...(updateQuery.$set || {}), room_allot: payload.roomAllot };
+    // Bedsheet boolean logic
+    if (payload.bedsheetTaken !== undefined) {
+        updateQuery.$set = {
+            ...(updateQuery.$set || {}),
+            bedsheet_taken: payload.bedsheetTaken,
+        };
     }
 
-    if (Object.keys(updateQuery).length === 0) {
+    if (Object.keys(updateQuery).length === 0 && !payload.roomAllot) {
         throw new ExpressError(400, "No valid fields to update");
     }
 
-    const update = await User.findOneAndUpdate(
-        {qr_hash: qrHash},
+    const updatedUser = await User.findOneAndUpdate(
+        {
+            qr_hash: qrHash,
+            ...(payload.foodCountDec && { food_count: { $gt: 0 } }),
+        },
         updateQuery,
-        {returnDocument: 'after'}
-    )
+        {
+            returnDocument: "after",
+            runValidators: true,
+        }
+    );
 
-    if (!update) throw new ExpressError(404, "User not found");
-    const team = await Team.findOne({team_id: update.team_id})
-    if (!team) throw new ExpressError(404, "User not found");
+    if (!updatedUser) throw new ExpressError(404, "User not found or invalid decrement");
+
+    if (payload.roomAllot) {
+        await Team.updateOne(
+            { team_id: updatedUser.team_id },
+            { $set: { room_number: payload.roomAllot } }
+        );
+    }
+    const team = await Team.findOne({ team_id: updatedUser.team_id }).lean();
+    if (!team) throw new ExpressError(404, "Team not found");
 
     res.status(200).json({
         success: true,
         message: "Data updated successfully",
         user: {
-            id: update._id,
-            username: update.username,
-            email: update.email,
-            role: update.role,
+            id: updatedUser._id,
+            username: updatedUser.username,
+            email: updatedUser.email,
+            role: updatedUser.role,
             team_name: team.team_name,
-            college_name: update.college_name,
-            is_present: update.is_present,
-            food_count: update.food_count,
-            bedsheet_taken: update.bedsheet_taken,
+            college_name: updatedUser.college_name,
+            is_present: updatedUser.is_present,
+            food_count: updatedUser.food_count,
+            bedsheet_taken: updatedUser.bedsheet_taken,
             room_allot: team.room_number,
-            qr_hash: update.qr_hash,
-        }
-    })
+            qr_hash: updatedUser.qr_hash,
+        },
+    });
 }
 
 //ppt-link and repo link or image-link submission( team leader )
@@ -273,6 +274,4 @@ export const teamLeaderProjectSubmission = async (req: Request, res: Response) =
         })
     
 }
-
-
 //commit links and image-link submission (team leader) 
