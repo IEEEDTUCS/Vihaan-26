@@ -100,6 +100,10 @@ export const updateTeam = async (req: Request, res: Response) => {
         runValidators: true,
     });
 
+    if (!team) {
+        throw new ExpressError(404, "Team not found");
+    }
+
     res.status(200).json({
         success: true,
         message: "Team updated successfully",
