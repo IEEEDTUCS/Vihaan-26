@@ -233,6 +233,22 @@ export const userVolunteerUpdatePayload = async (req: Request, res: Response) =>
     if (!updatedUser) throw new ExpressError(404, "User not found or invalid decrement");
 
     if (payload.roomAllot) {
+        const room = await Room.findOne({room_number: payload.roomAllot})
+        if (!room) throw new ExpressError(404, "Room not found");
+
+        const teamSize = await User.countDocuments({
+            team_id: updatedUser.team_id,
+        });
+
+        if (room.availability < teamSize) {
+            throw new ExpressError(400, "Room availability too low");
+        }
+
+        await Room.updateOne(
+            {room_number: room.room_number},
+            {availability: room.availability - teamSize},
+        )
+
         await Team.updateOne(
             { team_id: updatedUser.team_id },
             { $set: { room_number: payload.roomAllot } }
@@ -258,6 +274,26 @@ export const userVolunteerUpdatePayload = async (req: Request, res: Response) =>
             qr_hash: updatedUser.qr_hash,
         },
     });
+}
+
+export const fetchRoomsForUser = async (req: Request, res: Response) => {
+    const { qrHash } = req.params;
+    if (!qrHash) throw new ExpressError(400, "qrHash is required");
+
+    const user = await User.findOne({qr_hash: qrHash})
+    if (!user) throw new ExpressError(404, "User not found");
+    const team = await Team.findOne({team_id: user.team_id})
+    if (!team) throw new ExpressError(404, "User not found");
+
+    const teamSize = await User.countDocuments({
+        team_id: team.team_id,
+    });
+
+    const rooms = await Room.find({availability: {$gte: teamSize}})
+
+    return res.status(200).json({
+        rooms
+    })
 }
 
 //ppt-link and repo link or image-link submission( team leader )

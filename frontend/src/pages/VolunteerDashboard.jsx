@@ -12,11 +12,14 @@ export default function VolunteerDashboard() {
       decreaseUserFoodCount,
       updateUserBeddingTaken,
       unCheckInUser,
+      fetchRoomsForUser,
+      updateRoom
   } = useAuth();
 
   const [qrCode, setQrCode] = useState("");
   const [isScanning, setIsScanning] = useState(false);
   const [rsvpCode, setRsvpCode] = useState("");
+  const [rooms, setRooms] = useState([]);
 
   const [user, setUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -105,6 +108,23 @@ export default function VolunteerDashboard() {
         };
     }, [isScanning, handleScan]); // Re-run effect when isScanning changes
 
+    // fetch rooms when user loads
+    useEffect(() => {
+        if (!user?.qr_hash) return;
+
+        const fetchRooms = async () => {
+            try {
+                const roomsFetch = await fetchRoomsForUser(user.qr_hash);
+                setRooms(roomsFetch);
+                console.log(roomsFetch);
+            } catch (err) {
+                console.error("Failed to fetch rooms", err);
+            }
+        };
+
+        fetchRooms();
+    }, [user?.qr_hash, fetchRoomsForUser]);
+
   const handleRSVP = async () => {
     const cleanRSVP = rsvpCode.trim(); // FIX: Prevent Mongo space errors
     const cleanQR = qrCode.trim();
@@ -182,6 +202,19 @@ export default function VolunteerDashboard() {
         setError("");
         try {
             const data = await unCheckInUser(user.qr_hash);
+            setUser(data.user);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleRoomChange = async (room) => {
+        setLoading(true);
+        setError("");
+        try {
+            const data = await updateRoom(user.qr_hash, room);
             setUser(data.user);
         } catch (err) {
             setError(err.message);
@@ -312,9 +345,23 @@ export default function VolunteerDashboard() {
                       <button disabled={user.bedsheet_taken} onClick={() => {updateBedding(true)}} className="bg-indigo-100 disabled:bg-gray-200 disabled:text-gray-300 text-indigo-700 px-4 py-2 rounded-lg font-bold">+</button>
                   </div>
                   <div className="flex items-center justify-between bg-slate-50 p-3 rounded-xl">
-                      <span className="font-semibold">Room Alloted: {user.room_allot || "Not Alloted"}</span>
-                  </div>
-              </div>
+                      <span className="font-semibold">Room Allotted:</span>
+
+                      <select
+                          className="ml-4 p-2 rounded-lg border border-gray-300"
+                          value={user.room_allot || ""}
+                          onChange={(e) => handleRoomChange(e.target.value)}
+                      >
+                          {rooms && rooms.length > 0 ? (
+                              rooms.map((room) => (
+                                  <option key={room.room_number} value={room.room_number}>
+                                      {room.room_number}
+                                  </option>
+                              ))
+                          ) : (
+                              <option disabled>Loading rooms...</option>
+                          )}                      </select>
+                  </div>              </div>
             )}
 
             <button onClick={() => setShowModal(false)} className="mt-6 w-full text-slate-400 font-bold py-3">Close</button>

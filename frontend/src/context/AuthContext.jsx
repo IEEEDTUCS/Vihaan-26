@@ -281,6 +281,48 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const fetchRoomsForUser = async (qrHash) => {
+    try {
+      const res = await fetch(
+          `${backend_url}/api/user/scan/${qrHash}/rooms`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              authorization: `Bearer ${localStorage.getItem("authTokenAdmin")}`,
+            },
+          },
+      );
+      const body = await res.json()
+      return await body.rooms;
+    } catch (error) {
+      const backendMessage = error.response?.data?.message || error.response?.data?.error;
+      throw new Error(backendMessage || "Invalid Qr Hash Code.");
+    }
+  }
+
+  const updateRoom = async (qrHash, room_number) => {
+    try {
+      const reqBody = {
+        roomAllot: room_number,
+      }
+      const res = await fetch(
+          `${backend_url}/api/user/scan/${qrHash}/update`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              authorization: `Bearer ${localStorage.getItem("authTokenAdmin")}`,
+            },
+            body: JSON.stringify(reqBody)
+          },
+      );
+      return await res.json();
+    } catch (error) {
+      const backendMessage = error.response?.data?.message || error.response?.data?.error;
+      throw new Error(backendMessage || "Invalid Qr Hash Code.");
+    }
+  };
+
   // The value object contains everything we want to make available to our app
   const value = {
     user,
@@ -295,6 +337,8 @@ export const AuthProvider = ({ children }) => {
     decreaseUserFoodCount,
     updateUserBeddingTaken,
     unCheckInUser,
+    updateRoom,
+    fetchRoomsForUser,
     isAuthenticated: !!user || !!admin,
   };
 
