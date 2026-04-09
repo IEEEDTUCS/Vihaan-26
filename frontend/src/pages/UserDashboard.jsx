@@ -346,6 +346,14 @@ function InitialSubmissionForm({ team, token, onAlert }) {
       .map((c) => c.trim())
       .filter(Boolean);
 
+      if (categoryArray.length > 5) {
+        onAlert({
+          flags: ["Maximum 5 categories allowed"],
+          severity: 3,
+        });
+        return;
+      }
+
       const res = await fetch(`${BACKEND}/api/user/submit/initial`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
