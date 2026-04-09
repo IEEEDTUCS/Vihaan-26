@@ -115,6 +115,7 @@ export const uploadCSV = async (buffer: Buffer) => {
                 college_name,
                 rsvp_code: generateRSVP(email),
                 role,
+                qr_hash: undefined
             });
 
             created++;

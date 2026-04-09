@@ -88,21 +88,25 @@ type Room = {
     availability: number;
 }
 
-async function allotRoom(teamSize: number) {
-    const bestRoom = await Room.findOne({
+async function allotRoom(teamSize: number, isHardware: boolean) {
+    const query = isHardware ? {room_number: "201"} : {
+        room_number: { $ne: "201" },
         availability: { $gte: teamSize },
-    }).sort({ availability: -1 });
-
-    if (!bestRoom) {
-        throw new ExpressError(500, "No room available");
     }
 
-    const update = await Room.findOneAndUpdate({room_number: bestRoom.room_number}, {availability: bestRoom.availability - teamSize}, {returnDocument: "after"})
-    if (!update) {
+    const bestRoom = await Room.findOneAndUpdate(
+        query,
+        {$inc: {availability: -teamSize}},
+        {
+            sort: isHardware ? undefined : { availability: -1 },
+            returnDocument: "after"
+        }
+    )
+    if (!bestRoom) {
         throw new ExpressError(500, "Room allotment failed");
     }
 
-    return update.room_number;
+    return bestRoom.room_number;
 }
 
 export const findUserByQrCode = async (req: Request, res: Response) => {
@@ -176,7 +180,8 @@ export const markUserPresent = async (req: Request, res: Response) => {
         const count = await User.countDocuments({
             team_id: team.team_id,
         });
-        const room = await allotRoom(count)
+        const isHardware = team.type === "HARDWARE";
+        const room = await allotRoom(count, isHardware);
 
         team = await Team.findOneAndUpdate({team_id: team.team_id}, {room_number: room}, {returnDocument: "after"})
         if (!team) throw new ExpressError(404, "Couldn't find room");
