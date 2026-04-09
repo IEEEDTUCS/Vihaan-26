@@ -1,13 +1,18 @@
 import { useState, useEffect, useRef } from "react";
 import QrScanner from 'qr-scanner';
 import { useAuth } from "../context/AuthContext";
-import {useNavigate} from "react-router-dom";
-// const backend_url = import.meta.env.VITE_BACKEND_URL_VIHAAN;
 
 export default function VolunteerDashboard() {
   /* State */
   const scannerRef = useRef(null);
-  const { checkUserByQr, linkUserQr, markUserPresent, updateUserFoodCount, updateUserBeddingTaken } = useAuth();
+  const { checkUserByQr,
+      linkUserQr,
+      markUserPresent,
+      updateUserFoodCount,
+      decreaseUserFoodCount,
+      updateUserBeddingTaken,
+      unCheckInUser,
+  } = useAuth();
 
   const [qrCode, setQrCode] = useState("");
   const [isScanning, setIsScanning] = useState(false);
@@ -21,51 +26,6 @@ export default function VolunteerDashboard() {
   const [error, setError] = useState("");
 
   /* Scanner Setup */
-useEffect(() => {
-    // If not scanning, clean up and exit
-    if (!isScanning) {
-      if (scannerRef.current) {
-        scannerRef.current.stop();
-        scannerRef.current.destroy();
-        scannerRef.current = null;
-      }
-      return;
-    }
-
-    const videoElem = document.getElementById('qr-video');
-    
-    if (videoElem && !scannerRef.current) {
-      scannerRef.current = new QrScanner(
-        videoElem,
-        (result) => {
-          const decodedText = result.data.trim(); // Trim extra spaces
-          setQrCode(decodedText);
-          setIsScanning(false); // NEW: Turn off camera after scan
-          handleScan(decodedText); 
-        },
-        {
-          returnDetailedScanResult: true,
-          highlightScanRegion: true,
-          highlightCodeOutline: true,
-        }
-      );
-
-      scannerRef.current.start().catch(err => {
-        setError("Camera access denied or not found.");
-        setIsScanning(false);
-        console.error(err);
-      });
-    }
-
-    // Cleanup on unmount or when isScanning becomes false
-    return () => {
-      if (scannerRef.current) {
-        scannerRef.current.stop();
-        scannerRef.current.destroy();
-        scannerRef.current = null;
-      }
-    };
-  }, [isScanning]); // Re-run effect when isScanning changes
 
   /* Functions */
   const openUser = (userData) => {
@@ -79,7 +39,7 @@ useEffect(() => {
     const qr = (qrValue || qrCode).trim();
     if (!qr) return setError("Please enter or scan a QR code.");
     if (qr.length !== 8) return setError("QR code must be exactly 8 characters.");
-    
+
     setLoading(true);
     setError("");
     setShowRSVP(false);
@@ -98,6 +58,52 @@ useEffect(() => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+        // If not scanning, clean up and exit
+        if (!isScanning) {
+            if (scannerRef.current) {
+                scannerRef.current.stop();
+                scannerRef.current.destroy();
+                scannerRef.current = null;
+            }
+            return;
+        }
+
+        const videoElem = document.getElementById('qr-video');
+
+        if (videoElem && !scannerRef.current) {
+            scannerRef.current = new QrScanner(
+                videoElem,
+                (result) => {
+                    const decodedText = result.data.trim(); // Trim extra spaces
+                    setQrCode(decodedText);
+                    setIsScanning(false); // NEW: Turn off camera after scan
+                    handleScan(decodedText);
+                },
+                {
+                    returnDetailedScanResult: true,
+                    highlightScanRegion: true,
+                    highlightCodeOutline: true,
+                }
+            );
+
+            scannerRef.current.start().catch(err => {
+                setError("Camera access denied or not found.");
+                setIsScanning(false);
+                console.error(err);
+            });
+        }
+
+        // Cleanup on unmount or when isScanning becomes false
+        return () => {
+            if (scannerRef.current) {
+                scannerRef.current.stop();
+                scannerRef.current.destroy();
+                scannerRef.current = null;
+            }
+        };
+    }, [isScanning, handleScan]); // Re-run effect when isScanning changes
 
   const handleRSVP = async () => {
     const cleanRSVP = rsvpCode.trim(); // FIX: Prevent Mongo space errors
@@ -146,11 +152,36 @@ useEffect(() => {
             setLoading(false);
         }
     };
-    const addBedding = async () => {
+    const reduceFood = async () => {
         setLoading(true);
         setError("");
         try {
-            const data = await updateUserBeddingTaken(user.qr_hash);
+            const data = await decreaseUserFoodCount(user.qr_hash);
+            setUser(data.user);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+    const updateBedding = async (taken) => {
+        setLoading(true);
+        setError("");
+        try {
+            const data = await updateUserBeddingTaken(user.qr_hash, taken);
+            setUser(data.user);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const unCheckIn = async () => {
+        setLoading(true);
+        setError("");
+        try {
+            const data = await unCheckInUser(user.qr_hash);
             setUser(data.user);
         } catch (err) {
             setError(err.message);
@@ -250,6 +281,7 @@ useEffect(() => {
             <p className="text-sm text-slate-500 mb-6">{user.college_name || "No College Listed"}</p>
             <div className="flex gap-3 mb-6">
               <button
+                  disabled={user.is_present}
                 onClick={() => markAttendance()}
                 className={`flex-1 py-3 rounded-xl font-bold transition-all ${
                   user.is_present ? "bg-emerald-100 text-emerald-700 ring-2 ring-emerald-500" : "bg-emerald-500 text-white"
@@ -257,24 +289,31 @@ useEffect(() => {
               >
                 {user.is_present ? "✓ Checked In" : "Check In"}
               </button>
+                {user.is_present && (<button
+                    onClick={() => unCheckIn()}
+                    className={`flex-1 py-3 rounded-xl font-bold transition-all ${
+                        user.is_present ? "bg-red-100 text-red-700 ring-2 ring-red-500" : "bg-red-500 text-white"
+                    }`}
+                >
+                    {user.is_present ? "Un-check in" : "Check In"}
+                </button> )}
             </div>
 
             {user.is_present && (
               <div className="space-y-3 pt-4 border-t border-slate-100">
                 <div className="flex items-center justify-between bg-slate-50 p-3 rounded-xl">
+                    <button disabled={user.food_count === 0} onClick={reduceFood} className="bg-indigo-100 disabled:bg-gray-200 disabled:text-gray-300 text-indigo-700 px-4 py-2 rounded-lg font-bold">-</button>
                   <span className="font-semibold">Meals: {user.food_count}</span>
                   <button onClick={addFood} className="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg font-bold">+</button>
                 </div>
                   <div className="flex items-center justify-between bg-slate-50 p-3 rounded-xl">
+                      <button disabled={!user.bedsheet_taken} onClick={() => {updateBedding(false)}} className="bg-indigo-100 disabled:bg-gray-200 disabled:text-gray-300 text-indigo-700 px-4 py-2 rounded-lg font-bold">-</button>
                       <span className="font-semibold">Beddings: {user.bedsheet_taken ? "Taken" : "Not Taken"}</span>
-                      <button disabled={user.bedsheet_taken} onClick={addBedding} className="bg-indigo-100 disabled:bg-gray-200 disabled:text-gray-300 text-indigo-700 px-4 py-2 rounded-lg font-bold">+</button>
+                      <button disabled={user.bedsheet_taken} onClick={() => {updateBedding(true)}} className="bg-indigo-100 disabled:bg-gray-200 disabled:text-gray-300 text-indigo-700 px-4 py-2 rounded-lg font-bold">+</button>
                   </div>
                   <div className="flex items-center justify-between bg-slate-50 p-3 rounded-xl">
                       <span className="font-semibold">Room Alloted: {user.room_allot || "Not Alloted"}</span>
                   </div>
-                {/*<button  className="w-full bg-slate-100 py-3 rounded-xl font-semibold">*/}
-                {/*  {user.room_allot ? `Room: ${user.room_allot}` : "Assign Room"}*/}
-                {/*</button>*/}
               </div>
             )}
 
