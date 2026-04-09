@@ -34,6 +34,7 @@ export const csvUserRowSchema = z.object({
     username: z.string().trim().min(1, "username is required"),
     email: z.email("Invalid email").trim().toLowerCase(),
     college_name: z.string().trim().min(1, "college_name is required"),
+    type: z.string().trim().min(1, "type is required").max(50, "type must be at most 50 characters"),
     role: z.enum(["LEADER", "MEMBER"], { error: "role must be LEADER or MEMBER" }),
 });
 
