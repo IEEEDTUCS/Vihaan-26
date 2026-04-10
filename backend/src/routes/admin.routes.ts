@@ -7,7 +7,8 @@ import {
     deleteVolunteer, 
     getAllUsers, 
     getAllTeams, 
-    updateTeam, 
+    updateTeam,
+    getAllRooms,
     updateCheckpointStatus 
 } from "../controllers/admin.controller";
 import { adminAuth, createCheck, superAdminOnly } from "../middlewares/adminAuth";
@@ -45,5 +46,8 @@ router.get("/teams", adminAuth, superAdminOnly, wrapAsync(getAllTeams));
 router.put("/team/:id", adminAuth, superAdminOnly, validate(updateTeamSchema), wrapAsync(updateTeam));
 
 router.patch("/team/:teamId/checkpoint", adminAuth, superAdminOnly, validate(updateCheckpointStatusSchema), wrapAsync(updateCheckpointStatus));
+
+//get all rooms
+router.get("/rooms", adminAuth, wrapAsync(getAllRooms));
 
 export default router;

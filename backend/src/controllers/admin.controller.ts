@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { Admin } from "../models/admin.model";
 import { User } from "../models/user.model";
 import { Team } from "../models/team.model";
+import { Room } from "../models/room.model";
 import { generateAdminToken } from "../utils/generateToken";
 import ExpressError from "../utils/expressError";
 
@@ -51,8 +52,50 @@ export const getAllTeams = async (_req: Request, res: Response) => {
 export const updateTeam = async (req: Request, res: Response) => {
     const { id } = req.params;
     const updateData = req.body;
+    // console.log("from admin controller team update: ", updateData);
 
-    const team = await Team.findByIdAndUpdate( id, updateData, {
+    const existingTeam = await Team.findById(id);
+    if (!existingTeam) throw new ExpressError(404, "Team not found");
+
+    if (Object.prototype.hasOwnProperty.call(updateData, "room_number")) {
+
+        const oldRoom = existingTeam.room_number ?? "UNASSIGNED";
+        const newRoom = updateData.room_number ?? "UNASSIGNED";
+
+        if (oldRoom !== newRoom) {
+            const teamSize = await User.countDocuments({ team_id: existingTeam.team_id });
+
+            if (oldRoom !== "UNASSIGNED") {
+                await Room.findOneAndUpdate(
+                    { room_number: oldRoom },
+                    { $inc: { availability: teamSize } }
+                );
+            }
+
+            if (newRoom !== "UNASSIGNED") {
+                const roomDoc = await Room.findOne({ room_number: newRoom });
+                if (!roomDoc) throw new ExpressError(404, "Room not found");
+
+                if (roomDoc.availability < teamSize) {
+                    throw new ExpressError(400, `Room ${newRoom} is full`);
+                }
+
+                await Room.findOneAndUpdate(
+                    { room_number: newRoom },
+                    { $inc: { availability: -teamSize } }
+                );
+            }
+
+            await User.updateMany(
+                { team_id: existingTeam.team_id },
+                { $set: { room_allot: newRoom === "UNASSIGNED" ? null : newRoom } }
+            );
+        }
+
+        updateData.room_number = newRoom;
+    }
+
+    const team = await Team.findByIdAndUpdate(id, updateData, {
         new: true,
         runValidators: true,
     });
@@ -90,6 +133,15 @@ export const updateCheckpointStatus = async (req: Request, res: Response) => {
         success: true,
         message: `Round ${round_num} status updated to ${status}`,
         checkpoint,
+    });
+};
+
+//get all rooms
+export const getAllRooms = async (_req: Request, res: Response) => {
+    const rooms = await Room.find().sort({ room_number: 1 });
+    res.status(200).json({
+        success: true,
+        rooms,
     });
 };
 
