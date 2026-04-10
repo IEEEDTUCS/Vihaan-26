@@ -1,0 +1,13 @@
+.Header {
+    display: flex;
+    align-items: center;
+    gap: 150px;
+}
+
+.Header div {
+    padding-left: 23px;
+    font-size: 50px;
+    margin-bottom: 10px;
+    font-weight: 800;
+    margin-top: 6px;
+}

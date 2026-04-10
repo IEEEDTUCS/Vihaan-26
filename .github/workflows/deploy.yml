@@ -1,0 +1,73 @@
+name: Deploy Vihaan
+
+on:
+  push:
+    branches: ["main"]
+
+concurrency:
+  group: vihaan-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      # =========================
+      # BACKUP ENV
+      # =========================
+      - name: Backup backend .env
+        run: |
+          if [ -f ~/Vihaan-26/backend/.env ]; then
+            cp ~/Vihaan-26/backend/.env /tmp/backend_env
+          fi
+      # =========================
+      # GET LATEST CODE
+      # =========================
+      - name: Pull latest code
+        run: |
+          cd /home/ubuntu/Vihaan-26
+          git pull origin main
+      
+      # =========================
+      # BACKEND DEPLOY
+      # =========================
+      - name: Install backend deps
+        working-directory: /home/ubuntu/Vihaan-26/backend
+        run: npm ci
+      
+      - name: Build backend
+        working-directory: /home/ubuntu/Vihaan-26/backend
+        run: npm run build
+      
+      - name: Restart backend
+        run: |
+          pm2 reload vihaan-backend --update-env || pm2 start /home/ubuntu/Vihaan-26/backend/dist/main.js --name vihaan-backend
+          pm2 save
+
+      # =========================
+      # FRONTEND DEPLOY
+      # =========================
+
+      # =========================
+      
+      # FRONTEND ENV
+      # =========================
+      - name: Create frontend .env
+        run: |
+          echo "VITE_BACKEND_URL=https://api.notif.invictusdtu.in" > frontend/.env
+          echo "VITE_PUBLIC_VAPID_KEY=BLPn-8YuCP39crJWXYcptqfvxZHBTuEbqJqwwlqyJQk-yWd-MdoODjLpd6o5HmaeK9JKaRAAJ46iDuEedgOFglo" >> frontend/.env
+          echo "VITE_BACKEND_URL_VIHAAN=https://vihaan.ieeedtu.in/api" >> frontend/.env
+          
+      - name: Install frontend deps
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+      - name: Deploy frontend
+        run: |
+          sudo rm -rf /var/www/vihaan/*
+          sudo cp -r frontend/dist/* /var/www/vihaan/

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const images = ["/carousel.svg", "/carousel2.svg", "/carousel3.svg"];
 

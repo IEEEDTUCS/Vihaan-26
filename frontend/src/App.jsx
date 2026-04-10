@@ -1,42 +1,42 @@
-import { useState } from 'react'
-import Landing from './components/Landing.jsx'
-import Intro from './components/Loader.jsx'
-import Tracks from './components/Tracks.jsx'
-import Landing2 from './components/Landing2.jsx'
-import './App.css'
+import Home from "./pages/home.jsx";
+import AuthPage from "./pages/authpage.jsx";
+import AdminAuth from "./pages/adminauth.jsx";
+import VolunteerDashboard from "./pages/VolunteerDashboard.jsx";
+import UserDashboard from "./pages/UserDashboard.jsx";
+import SuperAdminDashboard from "./pages/SuperAdminDashboard.jsx";
+import "./App.css";
+import { ProtectedRoute, VolunteerProtectedRoute, AdminProtectedRoute } from "./utils/protectedRoute.jsx";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext.jsx";
+import VolunteerLogin from "./pages/VolunteerLogin.jsx";
 
 function App() {
-  const [showIntro, setShowIntro] = useState(true)
-
   return (
-    <>
-      {showIntro && (
-        <div id="loader">
-          <Intro
-            onComplete={() => {
-              console.log('Intro complete!')
-              setShowIntro(false)
-            }}
-          />
-        </div>
-      )}
+    <div>
+      <Router>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<AuthPage />} />
+            <Route path="/admin" element={<AdminAuth />} />
+            <Route path="/volunteer-login" element={<VolunteerLogin />} />
 
-      {!showIntro && (
-        <div id="landing">
-          <Landing />
-        </div>
-      )}
+            {/* Protected Routes */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/userDashboard" element={<UserDashboard />} />
+            </Route>
+            <Route element={<VolunteerProtectedRoute />}>
+              <Route path="/volunteerDashboard" element={<VolunteerDashboard />} />
+            </Route>
 
-      <div id="tracks">
-        <Tracks />
-      </div>
-
-      <div id="landing2">
-        <Landing2 />
-      </div>
-    </>
-  )
+            <Route element={<AdminProtectedRoute />}>
+              <Route path="/adminDashboard" element={<SuperAdminDashboard />} />
+            </Route>
+          </Routes>
+        </AuthProvider>
+      </Router>
+    </div>
+  );
 }
 
-export default App
-
+export default App;

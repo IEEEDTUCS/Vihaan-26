@@ -1,0 +1,24 @@
+{
+  "items": [
+    { "name": "Vaibhav Gautam", "designation": "Chairperson", "avatar": "/Team/CouncilPhotos/VaibhavGautam.jpg", "avatarBorder": "#373773", "cardBG": "#2222FF", "decorative": "/Team/decoratives/batman.svg" },
+    { "name": "Ketan Shankar", "designation": "Vice Chairperson", "avatar": "/Team/CouncilPhotos/KetanShankar.jpg", "avatarBorder": "#EB2929", "cardBG": "#BE0000", "decorative": "/Team/decoratives/spiderman.svg" },
+    { "name": "Spruha Kar", "designation": "General Secretary", "avatar": "/Team/CouncilPhotos/SpruhaKar.jpg", "avatarBorder": "#5F005F", "cardBG": "#6060FF", "decorative": "/Team/decoratives/transformer.svg" },
+    { "name": "Anshul Agrawal", "designation": "Joint Secretary", "avatar": "/Team/CouncilPhotos/AnshulAgrawal.jpg", "avatarBorder": "#10C310", "cardBG": "#008000", "decorative": "/Team/decoratives/ironman.svg" },
+    { "name": "Yash Arora", "designation": "Joint Secretary", "avatar": "/Team/CouncilPhotos/YashArora.jpg", "avatarBorder": "#EB2929", "cardBG": "#BE0000", "decorative": "/Team/decoratives/spiderman.svg" },
+    { "name": "Khobaib Akmal", "designation": "Treasurer", "avatar": "/Team/CouncilPhotos/KhobaibAkmal.jpg", "avatarBorder": "#373773", "cardBG": "#2222FF", "decorative": "/Team/decoratives/batman.svg" },
+    { "name": "Tasneem Ahmed", "designation": "Chairperson, CS", "avatar": "/Team/CouncilPhotos/TasneemAhmed.jpg", "avatarBorder": "#10C310", "cardBG": "#008000", "decorative": "/Team/decoratives/ironman.svg" },
+    { "name": "Kinshouk Munjal", "designation": "Vice Chairperson, CS", "avatar": "/Team/CouncilPhotos/KinshoukMunjal.png", "avatarBorder": "#5F005F", "cardBG": "#6060FF", "decorative": "/Team/decoratives/transformer.svg" },
+    { "name": "Abhimanyu Kumar Jha", "designation": "Vice Chairperson, CS", "avatar": "/Team/CouncilPhotos/AbhimanyuKumarJha.jpg", "avatarBorder": "#EB2929", "cardBG": "#BE0000", "decorative": "/Team/decoratives/spiderman.svg" },
+    { "name": "Ayush Grover", "designation": "Secretary, CS", "avatar": "/Team/CouncilPhotos/AyushGrover.jpg", "avatarBorder": "#373773", "cardBG": "#2222FF", "decorative": "/Team/decoratives/batman.svg" },
+    { "name": "Vaishnavi Saraswat", "designation": "Chairperson, PES-IAS", "avatar": "/Team/CouncilPhotos/VaishnaviSaraswat.jpg", "avatarBorder": "#10C310", "cardBG": "#008000", "decorative": "/Team/decoratives/ironman.svg" },
+    { "name": "Aaryan Agarwal", "designation": "Vice Chairperson, PES-IAS", "avatar": "/Team/CouncilPhotos/AaryanAgarwal.jpg", "avatarBorder": "#5F005F", "cardBG": "#6060FF", "decorative": "/Team/decoratives/transformer.svg" },
+    { "name": "Samarth Nagpal", "designation": "Secretary, PES-IAS", "avatar": "/Team/CouncilPhotos/SamarthNagpal.jpg", "avatarBorder": "#EB2929", "cardBG": "#BE0000", "decorative": "/Team/decoratives/spiderman.svg" },
+    { "name": "Jasmeen Kour", "designation": "Chairperson, CASS", "avatar": "/Team/CouncilPhotos/JasmeenKour.jpg", "avatarBorder": "#373773", "cardBG": "#2222FF", "decorative": "/Team/decoratives/batman.svg" },
+    { "name": "Arjun Pandita", "designation": "Vice Chairperson, CASS", "avatar": "/Team/CouncilPhotos/ArjunPandita.png", "avatarBorder": "#10C310", "cardBG": "#008000", "decorative": "/Team/decoratives/ironman.svg" },
+    { "name": "Tanishq Bhatia", "designation": "Secretary, CASS", "avatar": "/Team/CouncilPhotos/TanishqBhatia.jpg", "avatarBorder": "#5F005F", "cardBG": "#6060FF", "decorative": "/Team/decoratives/transformer.svg" },
+    { "name": "Supratim Dey Choudhury", "designation": "Chairperson, WIE", "avatar": "/Team/CouncilPhotos/SupratimDeyChoudhury.jpg", "avatarBorder": "#EB2929", "cardBG": "#BE0000", "decorative": "/Team/decoratives/spiderman.svg" },
+    { "name": "Kanav Pahwa", "designation": "Vice Chairperson, WIE", "avatar": "/Team/CouncilPhotos/KanavPahwa.jpg", "avatarBorder": "#373773", "cardBG": "#2222FF", "decorative": "/Team/decoratives/batman.svg" },
+    { "name": "Unnati Nath", "designation": "Head of Publications", "avatar": "/Team/CouncilPhotos/UnnatiNath.jpg", "avatarBorder": "#10C310", "cardBG": "#008000", "decorative": "/Team/decoratives/ironman.svg" },
+    { "name": "Tasneem Ahmed", "designation": "Webmaster", "avatar": "/Team/CouncilPhotos/TasneemAhmed.jpg", "avatarBorder": "#5F005F", "cardBG": "#6060FF", "decorative": "/Team/decoratives/transformer.svg" }
+  ]
+}

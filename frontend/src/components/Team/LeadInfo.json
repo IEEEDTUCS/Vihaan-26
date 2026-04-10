@@ -1,0 +1,9 @@
+{   
+    "items": [
+        { "name": "Jahan Sharma", "designation": "", "avatar": "/Team/EventLeads/JahanSharma.jpg", "avatarBorder": "#10C310", "cardBG": "#008000", "decorative": "/Team/decoratives/ironman.svg" },
+        { "name": "Rudit Madaan", "designation": "", "avatar": "/Team/EventLeads/RuditMadaan.jpg", "avatarBorder": "#373773", "cardBG": "#2222FF", "decorative": "/Team/decoratives/batman.svg" },
+        { "name": "Unnat Agrawal", "designation": "", "avatar": "/Team/EventLeads/UnnatAgrawal.webp", "avatarBorder": "#EB2929", "cardBG": "#BE0000", "decorative": "/Team/decoratives/spiderman.svg" },
+        { "name": "Tarush Sonakya", "designation": "", "avatar": "/Team/EventLeads/TarushSonakya.jpg", "avatarBorder": "#EB2929", "cardBG": "#BE0000", "decorative": "/Team/decoratives/spiderman.svg" },
+        { "name": "Ashutosh Mishra", "designation": "", "avatar": "/Team/EventLeads/AshutoshMishra.jpg", "avatarBorder": "#5F005F", "cardBG": "#6060FF", "decorative": "/Team/decoratives/transformer.svg" }
+    ]
+}

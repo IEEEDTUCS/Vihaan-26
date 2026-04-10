@@ -1,0 +1,53 @@
+.alumni-card {
+  border: 1px solid #9CA802;
+  border-radius: 16px;
+  padding: 12px;
+  padding-top: 0px;
+  margin: auto;
+  margin-top: 15px;
+  text-align: center;
+  width: 90%;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  color: #9CA802;
+}
+
+.card h1 {
+  font-size: 50px;
+  padding-right: 30px;
+}
+
+.card p {
+  font-size: 22px;
+  padding-bottom: 12px;
+  padding-right: 15px;
+}
+
+.alumni-card button {
+  background: transparent;
+  border: 1px solid white;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.alumni-card button {
+  background: transparent;
+  font-family: 'Bangers', cursive;
+  border: 1px solid white;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 20px;
+  cursor: pointer;
+}
+.alumni-card button:hover {
+  background: white;
+  color: black;
+  transition: 0.3s ease-in-out;
+}

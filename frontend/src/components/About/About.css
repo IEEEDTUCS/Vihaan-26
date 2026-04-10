@@ -1,0 +1,20 @@
+.About {
+    color: white;
+    font-family: "Bangers", "Impact", sans-serif;
+    -webkit-text-stroke: 1px black;
+    width: 438px;
+    height: 100%;
+    background-color: black;
+    background-repeat: no-repeat;
+    background-size: cover;
+    padding-top: 30px; 
+}
+
+@media (max-width: 768px) {
+    .About {
+        width: 400px;
+        font-size: 18px;
+        margin: auto;
+        padding: 20px;
+    }
+}
