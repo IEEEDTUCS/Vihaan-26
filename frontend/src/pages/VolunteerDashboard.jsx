@@ -121,6 +121,10 @@ const handleScan = async (qrValue) => {
       return setError("QR Hash missing hai! Please scan the badge again.");
     }
 
+    if(qrCode.trim().length !== 8) {
+      return setError("Invalid QR Hash format. Length should be exactly 8 characters.");
+    }
+
     // --- 2. RSVP CODE FRONTEND CHECK ---
     if (!rsvpCode || rsvpCode.trim() === "") {
       return setError("Please enter an RSVP code.");
@@ -144,7 +148,8 @@ const handleScan = async (qrValue) => {
       setRsvpCode(""); 
       openUser(data.user);
     } catch (err) {
-      setError(err.message);
+      console.log(err);
+      setError("Invalid or Failed to link RSVP code. " );
     } finally {
       setLoading(false);
     }

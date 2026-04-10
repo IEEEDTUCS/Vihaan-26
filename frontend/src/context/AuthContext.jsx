@@ -173,30 +173,32 @@ export const AuthProvider = ({ children }) => {
     return await res.json();
 
   }
- const linkUserQr = async (qrHash, rsvpCode) => {
-    try {
-      const reqBody = {
-        rsvpCode,
-        qrHash,
-      }
-      // MATCHES: router.post("/linkQr")
-      const res = await fetch(
-        `${backend_url}/api/user/linkQr`,
-        {
-          method: "POST",
-          headers: {
-           "Content-Type": "application/json",
-            authorization: `Bearer ${localStorage.getItem("authTokenAdmin")}`,
-          },
-          body: JSON.stringify(reqBody)
-        },
-      );
-      return await res.json();
-    } catch (error) {
-      const backendMessage = error.response?.data?.message || error.response?.data?.error;
-      throw new Error(backendMessage || "Invalid RSVP Code.");
+const linkUserQr = async (qrHash, rsvpCode) => {
+  try {
+    const reqBody = { rsvpCode, qrHash };
+
+    const res = await fetch(`${backend_url}/api/user/linkQr`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${localStorage.getItem("authTokenAdmin")}`,
+      },
+      body: JSON.stringify(reqBody),
+    });
+
+    const data = await res.json();
+
+    // 🔥 THIS IS THE FIX
+    if (!res.ok) {
+      throw new Error(data.message || data.error || "Invalid RSVP Code.");
     }
-  };
+
+    return data;
+
+  } catch (error) {
+    throw new Error(error.message || "Invalid RSVP Code.");
+  }
+};
 
   const markUserPresent = async (qrHash) => {
     try {
