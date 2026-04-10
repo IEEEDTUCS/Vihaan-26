@@ -246,7 +246,7 @@ const handleScan = async (qrValue) => {
                       onClick={handleRSVP}
                       className="w-full bg-slate-900 text-white font-semibold py-3 rounded-lg cursor-pointer hover:bg-slate-800"
                   >
-                      Link User
+                      Link-User
                   </button>
               </div>
           )}
