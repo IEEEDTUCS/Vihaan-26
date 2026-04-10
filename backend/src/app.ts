@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import { connectDB } from "./config/db";
-import uploadRoutes from "./routes/upload.routes";
+// import uploadRoutes from "./routes/upload.routes";
 import adminRoutes from "./routes/admin.routes";
 import userRoutes from "./routes/user.routes";
 import ExpressError from "./utils/expressError";
@@ -49,7 +49,7 @@ const limiter = rateLimit({
 
 app.use(limiter);
 // Routes
-app.use("/api/upload", uploadRoutes);
+// app.use("/api/upload", uploadRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/user", userRoutes);
 

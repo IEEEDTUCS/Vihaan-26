@@ -25,7 +25,7 @@ export const handleImageUpload = async (req: Request, res: Response): Promise<vo
 
 
   try {
-    const result = await uploadImageToCloudinary(req.file.buffer, "profile-images");
+    const result = await uploadImageToCloudinary(req.file.buffer, "vihaan26/initial");
 
     res.status(201).json({
       success: true,
