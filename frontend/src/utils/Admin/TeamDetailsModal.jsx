@@ -88,7 +88,7 @@ function PanelDropdown({ value, onChange, allRooms }) {
                     : "transparent";
                 }}
               >
-                Room {room.room_number}
+                Panel {room.room_number}
               </div>
             );
           })}
