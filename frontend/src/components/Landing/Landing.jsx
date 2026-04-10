@@ -274,7 +274,7 @@ export default function Landing({ showPrizes, setShowPrizes, glowTrigger, setGlo
 
             <div className="mb-4 text-lg reg tracking-wide">REGISTRATIONS CLOSED</div>
 
-            <Button text="Login" link="http://localhost:5173/login" type={true} />
+            <Button text="Login" link="https://vihaan.ieeedtu.in/login" type={false} />
 
             {/* ── Timer: compact, below the Unstop button ── */}
             <div className="mt-8">
