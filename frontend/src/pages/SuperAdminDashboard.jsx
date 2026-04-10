@@ -21,6 +21,7 @@ export default function SuperAdminDashboard() {
   const [loading, setLoading] = useState(false);
   const [alerts, setAlerts] = useState([]);
 
+  
   const token = localStorage.getItem("authTokenAdmin");
   const displayAdmin = admin;
 
