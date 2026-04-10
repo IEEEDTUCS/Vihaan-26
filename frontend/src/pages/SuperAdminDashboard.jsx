@@ -156,8 +156,8 @@ export default function SuperAdminDashboard() {
 
       setAlerts([{ message: successMessage + ` for Team: ${editedTeam.team_name}`, severity: 0 }]);
 
-      //re-fetch both teams and rooms after a save so availability stays fresh
-      await Promise.all([fetchTeams(), fetchRooms()]);
+      //re-fetch teams, users and rooms after a save so data stays fresh for excel download
+      await Promise.all([fetchTeams(), fetchUsers(), fetchRooms()]);
     } catch (err) {
       setAlerts([{ message: err.message, severity: 2 }]);
     }
