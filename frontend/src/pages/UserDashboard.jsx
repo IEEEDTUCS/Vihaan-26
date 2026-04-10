@@ -289,7 +289,7 @@ export default function UserDashboard() {
             : checkpoints.map(cp => <CheckpointRow key={cp.round_num} cp={cp} token={token} onAlert={showAlerts} isLeader={isLeader} teamType={team?.type}  />)}
         </Section>
 
-        <Section title="03 · My Status" borderColor="#4a90e2" bgColor="rgba(74,144,226,0.08)" textColor="#7ab8f5" defaultOpen>
+        <Section title="03 · My Status" borderColor="#4a90e2" bgColor="rgba(74,144,226,0.08)" textColor="#7ab8f5">
           <StatusSection user={activeUser} team={team} />
         </Section>
       </div>

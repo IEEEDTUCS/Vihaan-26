@@ -334,6 +334,23 @@ export default function TeamDetailsModal({ team, onClose, onSave, token, allRoom
     display: "block",
   };
 
+  const formatIST = (dateStr) => {
+  const d = new Date(dateStr);
+
+  // 🔧 Fix: subtract 5.5 hours (reverse unwanted shift)
+  const corrected = new Date(d.getTime() - (5.5 * 60 * 60 * 1000));
+
+  return corrected.toLocaleString("en-IN", {
+    timeZone: "Asia/Kolkata",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+};
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -498,15 +515,7 @@ export default function TeamDetailsModal({ team, onClose, onSave, token, allRoom
                 </span>
                 <span style={{ fontFamily: "Edu TAS Beginner, sans-serif", fontSize: "0.75rem", color: "#888" }}>
                   {cp.checkpoint_time
-                    ? new Date(cp.checkpoint_time).toLocaleString("en-IN", {
-                        timeZone: "Asia/Kolkata",
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        hour12: true,
-                      })
+                    ? formatIST(cp.checkpoint_time)
                     : "No Date Provided"}
                 </span>
               </div>
