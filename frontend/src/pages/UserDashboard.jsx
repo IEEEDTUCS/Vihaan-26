@@ -222,7 +222,7 @@ export default function UserDashboard() {
     if (!token) return;
     fetch(`${BACKEND}/api/user/team`, { headers:{ Authorization:`Bearer ${token}` } })
       .then(r => r.json()).then(d => { if (d.success) setTeamData(d.team); }).catch(() => {});
-  }, [token]);
+  }, []);
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background:"#0d0d0d" }}>
@@ -359,14 +359,26 @@ function InitialSubmissionForm({ team, token, onAlert, windowOpen }) {
   const [imageFile, setImageFile] = useState(null);
   const [category, setCategory] = useState(team?.category?.join(", ") || "");
   const [saving, setSaving] = useState(false);
+  const [existingImage, setExistingImage] = useState("");
   const isHardware = type === "HARDWARE";
+
+  useEffect(() => {
+  if (!team) return;
+  if (team.type === "HARDWARE") {
+    setExistingImage(team.repo_or_image_link || "");
+  }
+  setRepoLink(team.repo_or_image_link || "");
+  setDescription(team.description || "");
+  setType(team.type || "");
+  setCategory(team.category?.join(", ") || "");
+}, [team]);
 
   const inputStyle = { width:"100%", background:"rgba(255,255,255,0.05)", border:"1px solid #444",
     borderRadius:"0.4rem", padding:"10px 12px", color:"#fff",
     fontFamily:"Edu TAS Beginner, sans-serif", fontSize:"0.95rem", outline:"none", marginTop:6, marginBottom:14 };
   const labelStyle = { fontFamily:"Bangers", fontSize:"1rem", letterSpacing:"0.15em", color:"#9CA802" };
 
-  if (alreadySubmitted) return <ReadOnlyInitial team={team} />;
+  // if (alreadySubmitted) return <ReadOnlyInitial team={team} />;
   if (!windowOpen) return <p style={{ fontFamily:"Edu TAS Beginner, sans-serif", color:"#888" }}>Submission window is not open yet.</p>;
 
   const handleSubmit = async (e) => {
@@ -428,7 +440,7 @@ function InitialSubmissionForm({ team, token, onAlert, windowOpen }) {
   return (
     <form onSubmit={handleSubmit}>
       <label style={labelStyle}>Track Type</label>
-      <DarkSelect value={type} onChange={setType} options={["WOMEN","FRESHERS","IEEE","SOFTWARE","HARDWARE"]} placeholder="-- Select --" style={{ marginTop:6, marginBottom:14 }} />
+      <DarkSelect value={type} onChange={setType} options={["SOFTWARE","HARDWARE"]} placeholder="-- Select --" style={{ marginTop:6, marginBottom:14 }} />
       <label style={labelStyle}>Category / Domain</label>
       <input type="text" placeholder="e.g. FinTech, Health Tech (comma separated)" value={category} onChange={e => setCategory(e.target.value)} style={inputStyle} />
       <label style={labelStyle}>Project Description</label>
@@ -438,6 +450,43 @@ function InitialSubmissionForm({ team, token, onAlert, windowOpen }) {
           <label style={labelStyle}>Project Image (Hardware)</label>
           <input type="file" accept="image/*" onChange={e => setImageFile(e.target.files[0])} style={{ ...inputStyle, padding:"6px" }} />
           <p style={{ fontFamily:"Edu TAS Beginner, sans-serif", color:"#888", fontSize:"0.8rem", marginTop:-10, marginBottom:14 }}>Keep image between 300–400 KB.</p>
+        
+
+              {/* 🔥 EXISTING IMAGE */}
+              {existingImage && !imageFile && (
+                <div style={{ marginTop: "10px" }}>
+                  <p style={{ color: "#888", fontSize: "0.8rem" }}>
+                    Current Image:
+                  </p>
+                  <img
+                    src={existingImage}
+                    alt="Current"
+                    style={{
+                      width: "200px",
+                      borderRadius: "0.5rem",
+                      border: "1px solid #444"
+                    }}
+                  />
+                </div>
+              )}
+
+              {/* 🔥 NEW IMAGE PREVIEW */}
+              {imageFile && (
+                <div style={{ marginTop: "10px" }}>
+                  <p style={{ color: "#888", fontSize: "0.8rem" }}>
+                    New Image Preview:
+                  </p>
+                  <img
+                    src={URL.createObjectURL(imageFile)}
+                    alt="Preview"
+                    style={{
+                      width: "200px",
+                      borderRadius: "0.5rem",
+                      border: "1px solid #444"
+                    }}
+                  />
+                </div>
+              )}
         </>
       ) : (
         <>
