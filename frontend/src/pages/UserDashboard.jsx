@@ -9,7 +9,7 @@ const BACKEND = import.meta.env.VITE_BACKEND_URL_VIHAAN || "http://localhost:300
 const WINDOWS = {
   initial: {
     open: new Date("2026-04-11T14:00:00+05:30"),
-    close: new Date("2026-04-11T15:30:00+05:30"),
+    close: new Date("2026-04-11T16:30:00+05:30"),
   },
   1: {
     open: new Date("2026-04-11T16:00:00+05:30"),
@@ -429,9 +429,8 @@ function InitialSubmissionForm({ team, token, onAlert, windowOpen }) {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Submission failed");
-      if (data.githubCheck) onAlert(data.githubCheck);
-      else onAlert({ flags:["Submission saved successfully"], severity:0 });
-      window.location.reload();
+       onAlert({ flags:["Submission saved successfully"], severity:0 });
+      // window.location.reload();
     } catch (err) {
       onAlert({ flags:[err.message || "Submission failed"], severity:3 });
     } finally { setSaving(false); }

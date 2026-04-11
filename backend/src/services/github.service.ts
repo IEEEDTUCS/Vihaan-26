@@ -58,7 +58,11 @@ export const checkInitialRepo = async (
         severity = Math.max(severity, 3) as 3;
     }
 
-    if (commits.length > 0) {
+    if(commits.length === 0) {
+        flags.push("Repo has no commits — must be freshly created");
+        severity = Math.max(severity, 1) as 1;
+    }
+    if (commits.length > 3) {   
         flags.push("Repo already has commits — must be freshly created with zero commits");
         severity = Math.max(severity, 3) as 3;
     }

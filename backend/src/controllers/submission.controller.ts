@@ -120,8 +120,8 @@ export const submitCheckpoint = async (req: Request, res: Response) => {
 
     const team = await Team.findOne({ team_id: user.team_id });
     if (!team) throw new ExpressError(404, "Team not found");
-
-    const cpIndex = team.checkpoints.findIndex((c) => c.round_num === round_num);
+    const roundNum = Number(round_num);
+    const cpIndex = team.checkpoints.findIndex((c) => c.round_num === roundNum);
     if (cpIndex === -1) throw new ExpressError(404, "Checkpoint not found");
 
     let githubCheck = null;
