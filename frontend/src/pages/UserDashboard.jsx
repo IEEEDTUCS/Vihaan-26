@@ -400,7 +400,7 @@ function InitialSubmissionForm({ team, token, onAlert, windowOpen }) {
       let finalRepoLink = repoLink;
       if (isHardware && imageFile) {
         const fd = new FormData();
-        fd.append("image", imageFile);
+        fd.append("file", imageFile);
         const uploadRes = await fetch(`${BACKEND}/api/upload/image`, {
           method:"POST", headers:{ Authorization:`Bearer ${token}` }, body:fd,
         });
