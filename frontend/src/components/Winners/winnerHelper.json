@@ -1,0 +1,101 @@
+{
+  "winners": [
+    {
+      "track": "💻 Software Track",
+      "team": "Coffee Please",
+      "runnerUp": "Hyperscanners",
+      "secondRunnerUp": "Karmath Yuva",
+      "projectName": "DualCast",
+      "description": "DualCast is a real-time, privacy-preserving AI eSports commentary engine built on a multimodal Vision-Language pipeline (Qwen2.5-VL).",
+      "bgColor": "#FFE500",
+      "borderColor": "orange",
+      "buttonPath": "Faqs/ButtonClicks/NonClickv4.svg",
+      "textColor": "black",
+      "media": {
+        "winner": {
+          "team": "/Winners/image5.png",
+          "project": "/Winners/dualcast.png",
+          "name": "DualCast"
+        },
+        "runnerUp": {
+          "team": "/Winners/image1.png",
+          "project": "/Winners/agritech.jpg",
+          "name": "AgriTech"
+        },
+        "secondRunnerUp": {
+          "team": "/Winners/scanner_nidaan.jpeg",
+          "project": "/Winners/mavis_pic.jpeg",
+          "name": "NIDAAN AI"
+        }
+      }
+    },
+    {
+      "track": "🤖 Hardware Track",
+      "team": "Team Zoltrack",
+      "projectName": "CareBot",
+      "description": "The CareBot is an AI-powered assistant for elderly and patients that monitors health, detects falls or abnormalities, and alerts caregivers instantly. It also manages daily routines, provides reminders, enables voice interaction, offers entertainment, and autonomously assists with navigation and essential tasks.",
+      "bgColor": "#373773",
+      "borderColor": "DarkSlateBlue",
+      "buttonPath": "Faqs/ButtonClicks/NonClickv2.svg",
+      "textColor": "white",
+      "media": {
+        "winner": {
+          "team": "/Winners/image9.png",
+          "project": "/Winners/carebot.jpg",
+          "name": "CareBot"
+        }
+      }
+    },
+    {
+      "track": "🌱 Best Freshers Team",
+      "team": "Code Catalyst",
+      "projectName": "RESQNET",
+      "description": "RESQNET is a decentralized, resilience-first disaster response system designed to function without traditional infrastructure, enabling communication and coordination even during power and network failures.",
+      "bgColor": "#3D6518",
+      "borderColor": "OliveDrab",
+      "buttonPath": "Faqs/ButtonClicks/NonClickv3.svg",
+      "textColor": "white",
+      "media": {
+        "winner": {
+          "team": "/Winners/image8.png",
+          "project": "/Winners/resqnet.png",
+          "name": "RESQNET"
+        }
+      }
+    },
+    {
+      "track": "👩‍💻 Best WIE Team",
+      "team": "S.Y.S.D",
+      "projectName": "Overlay AI",
+      "description": "Overlay AI is an on-screen AI co-pilot that helps users instantly understand, fix, or act on anything visible with a single keystroke.",
+      "bgColor": "#5F005F",
+      "borderColor": "DarkViolet",
+      "buttonPath": "Faqs/ButtonClicks/NonClickv1.svg",
+      "textColor": "white",
+      "media": {
+        "winner": {
+          "team": "/Winners/image2.png",
+          "project": "/Winners/overlayai.png",
+          "name": "Overlay AI"
+        }
+      }
+    },
+    {
+      "track": "🌐 Best IEEE Team",
+      "team": "Code 4 baddies",
+      "projectName": "DeepDetect",
+      "description": "DeepDetect analyzes speech patterns at the signal level to expose synthetic voices with forensic precision, empowering users to identify and combat deepfakes effectively.",
+      "bgColor": "#FFE500",
+      "borderColor": "orange",
+      "buttonPath": "Faqs/ButtonClicks/NonClickv4.svg",
+      "textColor": "black",
+      "media": {
+        "winner": {
+          "team": "/Winners/image7.png",
+          "project": "/Winners/deepdetect.jpg",
+          "name": "DeepDetect"
+        }
+      }
+    }
+  ]
+}
