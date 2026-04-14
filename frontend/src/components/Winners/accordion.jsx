@@ -1,6 +1,5 @@
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import '../../App.css'
 
 const Accordion = ({ QAPair, isOpen, onToggle, index = 0 }) => {
   const contentRef = useRef(null);
@@ -69,7 +68,7 @@ const Accordion = ({ QAPair, isOpen, onToggle, index = 0 }) => {
                 {/* CLICK EFFECT (topmost) */}
                 {showClickEffect && (
                   <img
-                    src="/ButtonClicks/ClickEffect.svg"
+                    src="/Faqs/ButtonClicks/ClickEffect.svg"
                     alt=""
                     style={{
                       position: 'absolute',
@@ -136,7 +135,7 @@ const Accordion = ({ QAPair, isOpen, onToggle, index = 0 }) => {
                     transform: pressed ? 'translateY(6px)' : 'none',
                     cursor: 'pointer',
                     position: 'relative',
-                    zIndex: 3, // 🔥 ensures image is visible
+                    zIndex: 3, 
                   }}
                 >
                   <img
@@ -177,8 +176,10 @@ const Accordion = ({ QAPair, isOpen, onToggle, index = 0 }) => {
             }}
           >
             <div>🏆 Winner: {QAPair.team}</div>
-            <div>🥈 Runner-up: {QAPair.runnerUp}</div>
-            <div>🥉 2nd Runner-up: {QAPair.secondRunnerUp}</div>
+            { QAPair.runnerUp && <div>🥈 Runner-up: {QAPair.runnerUp}</div> }
+            { QAPair.secondRunnerUp && <div>🥉 2nd Runner-up: {QAPair.secondRunnerUp}</div> }
+
+            <div style={{marginTop: '10px'}}> Winning Product: {QAPair.projectName}</div>
 
             <div style={{ marginTop: '10px', fontSize: '1.2rem' }}>
               {QAPair.description}

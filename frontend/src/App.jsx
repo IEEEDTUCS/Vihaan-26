@@ -4,6 +4,7 @@ import AdminAuth from "./pages/adminauth.jsx";
 import VolunteerDashboard from "./pages/VolunteerDashboard.jsx";
 import UserDashboard from "./pages/UserDashboard.jsx";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard.jsx";
+import Winner from "./pages/Winner.jsx";
 import "./App.css";
 import { ProtectedRoute, VolunteerProtectedRoute, AdminProtectedRoute } from "./utils/protectedRoute.jsx";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
@@ -20,6 +21,7 @@ function App() {
             <Route path="/login" element={<AuthPage />} />
             <Route path="/admin" element={<AdminAuth />} />
             <Route path="/volunteer-login" element={<VolunteerLogin />} />
+            <Route path="/winners" element={<Winner />} />
 
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>

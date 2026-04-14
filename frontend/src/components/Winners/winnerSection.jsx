@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Accordion from "./accordion";
-import winnerHelper from "./winnerHelper.json";
+import winnerHelper from "./winnerHelper";
 
 export default function WinnersSection() {
   const [openIndex, setOpenIndex] = useState(null);
@@ -43,8 +43,8 @@ export default function WinnersSection() {
                 style={{
                   position: 'absolute',
                   inset: '-1.8em',
-                  background: 'url(/ActionBubble.svg) no-repeat center',
-                  backgroundSize: '100% 125%',
+                  background: 'url(/Faqs/ActionBubble.svg) no-repeat center',
+                  backgroundSize: '100% 130%',
                   zIndex: '-1',
                   pointerEvents: 'none',
                 }}
