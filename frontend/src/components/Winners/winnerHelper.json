@@ -10,7 +10,24 @@
       "bgColor": "#FFE500",
       "borderColor": "orange",
       "buttonPath": "Faqs/ButtonClicks/NonClickv4.svg",
-      "textColor": "black"
+      "textColor": "black",
+      "media": {
+        "winner": {
+          "team": "/Winners/image5.png",
+          "project": "/Winners/dualcast.png",
+          "name": "DualCast"
+        },
+        "runnerUp": {
+          "team": "/Winners/image1.png",
+          "project": "/Winners/agritech.jpg",
+          "name": "AgriTech"
+        },
+        "secondRunnerUp": {
+          "team": "/Winners/scanner_nidaan.jpeg",
+          "project": "/Winners/mavis_pic.jpeg",
+          "name": "NIDAAN AI"
+        }
+      }
     },
     {
       "track": "🤖 Hardware Track",
@@ -20,7 +37,14 @@
       "bgColor": "#373773",
       "borderColor": "DarkSlateBlue",
       "buttonPath": "Faqs/ButtonClicks/NonClickv2.svg",
-      "textColor": "white"
+      "textColor": "white",
+      "media": {
+        "winner": {
+          "team": "/Winners/image9.png",
+          "project": "/Winners/carebot.jpg",
+          "name": "CareBot"
+        }
+      }
     },
     {
       "track": "🌱 Best Freshers Team",
@@ -30,7 +54,14 @@
       "bgColor": "#3D6518",
       "borderColor": "OliveDrab",
       "buttonPath": "Faqs/ButtonClicks/NonClickv3.svg",
-      "textColor": "white"
+      "textColor": "white",
+      "media": {
+        "winner": {
+          "team": "/Winners/image8.png",
+          "project": "/Winners/resqnet.png",
+          "name": "RESQNET"
+        }
+      }
     },
     {
       "track": "👩‍💻 Best WIE Team",
@@ -40,7 +71,14 @@
       "bgColor": "#5F005F",
       "borderColor": "DarkViolet",
       "buttonPath": "Faqs/ButtonClicks/NonClickv1.svg",
-      "textColor": "white"
+      "textColor": "white",
+      "media": {
+        "winner": {
+          "team": "/Winners/image2.png",
+          "project": "/Winners/overlayai.png",
+          "name": "Overlay AI"
+        }
+      }
     },
     {
       "track": "🌐 Best IEEE Team",
@@ -50,7 +88,13 @@
       "bgColor": "#FFE500",
       "borderColor": "orange",
       "buttonPath": "Faqs/ButtonClicks/NonClickv4.svg",
-      "textColor": "black"
+      "textColor": "black",
+      "media": {
+        "winner": {
+          "team": "/Winners/image7.png",
+          "name": "DeepfakeID"
+        }
+      }
     }
   ]
 }
