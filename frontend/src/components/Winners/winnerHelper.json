@@ -83,8 +83,8 @@
     {
       "track": "🌐 Best IEEE Team",
       "team": "Code 4 baddies",
-      "projectName": "DeepfakeID",
-      "description": "DeepfakeID is a real-time liveness detection API that analyzes blink patterns, head pose, skin texture, and motion entropy to classify videos as real or fake, targeting secure KYC and onboarding systems.",
+      "projectName": "DeepDetect",
+      "description": "DeepDetect analyzes speech patterns at the signal level to expose synthetic voices with forensic precision, empowering users to identify and combat deepfakes effectively.",
       "bgColor": "#FFE500",
       "borderColor": "orange",
       "buttonPath": "Faqs/ButtonClicks/NonClickv4.svg",
@@ -92,7 +92,8 @@
       "media": {
         "winner": {
           "team": "/Winners/image7.png",
-          "name": "DeepfakeID"
+          "project": "/Winners/deepdetect.jpg",
+          "name": "DeepDetect"
         }
       }
     }
