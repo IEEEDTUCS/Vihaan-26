@@ -1,0 +1,115 @@
+@import "tailwindcss";
+body {
+  overflow-x: hidden;
+}
+
+html{
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  lazyload: true;
+}
+
+.font-bangers {
+  font-family: 'Bangers', cursive;
+}
+
+.heading {
+ font-family: "Bangers", cursive;
+  font-weight: 400;
+  font-size: 12vh;
+  line-height: 1;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  -webkit-text-stroke: 1px black;
+  background-image: linear-gradient(
+    180deg,
+     #FF8C1A,
+    #FFD23F
+   
+  );
+
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(3px 3px 0 #000);
+  transform: skewX(-4deg);
+  display: inline-block;
+}
+
+.heading-invert {
+  font-family: "Bangers", cursive;
+  font-weight: 400;
+  font-size: 9vh;
+  line-height: 1;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  display: inline-block;
+  transform: skewX(-4deg);
+
+  color: #f2f2f2; 
+
+  text-shadow:
+    -2px -2px 0 #000,
+     2px -2px 0 #000,
+    -2px  2px 0 #000,
+     2px  2px 0 #000,
+
+     7px 2px 0 #f4b400,
+     8px 6px 0 #000;
+}
+
+.paragraph {
+  /* 1. Change Font: Use 'Bangers' or 'Impact' for that blocky comic look */
+  font-family: "Bangers", "Impact", sans-serif;
+  color: #FFFFFF;
+  -webkit-text-stroke: 1px black; /* stroke lgana seekhlo bs */
+  text-shadow: 4px 4px 0px #000000;
+  font-size: 4vh;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  font-weight: 500; 
+  width: 75%; 
+}
+
+.nav-text {
+  font-family: "Julee", cursive;
+  font-weight: 400;
+  font-size: 25px;
+  line-height: 1;         
+  letter-spacing: 0.05em;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.reg{
+  font-family: "Bangers";
+  margin: 2px;
+  font-size: 25px;
+  -webkit-text-stroke: 1px black;
+}
+
+.comic-text-shadow {
+  /* Yellow text base, black hard offset shadow */
+  color: #fef041; /* bright yellow from ref images */
+  text-shadow: 
+    3px 3px 0px #000, 
+    5px 5px 0px rgba(0,0,0,0.8);
+  /* Fallback for non-supporting browsers */
+  -webkit-text-stroke: 1px black; 
+}
+
+@keyframes glowFade {
+  0%, 100% {
+    box-shadow: 0 0 4px rgba(208,190,128,0.3);
+    opacity: 0.6;
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(208,190,128,0.95);
+    opacity: 1;
+  }
+}
+
+.glow-hr {
+  animation: glowFade 4s ease-in-out infinite;
+}

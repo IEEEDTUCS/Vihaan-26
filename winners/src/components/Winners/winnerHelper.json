@@ -1,0 +1,48 @@
+{
+  "winners": [
+    {
+      "track": "🚀 AI / ML Track",
+      "team": "Team Alpha",
+      "runnerUp": "Team Beta",
+      "secondRunnerUp": "Team Gamma",
+      "description": "Built an AI-powered system for real-time decision making and predictive analytics.",
+      "bgColor": "#FFE500",
+      "borderColor": "orange",
+      "buttonPath": "ButtonClicks/NonClickv4.svg",
+      "textColor": "black"
+    },
+    {
+      "track": "🌐 Web3 Track",
+      "team": "Team ChainX",
+      "runnerUp": "Team Blockers",
+      "secondRunnerUp": "Team CryptoNinjas",
+      "description": "Developed a decentralized identity platform ensuring secure and privacy-first authentication.",
+      "bgColor": "#373773",
+      "borderColor": "DarkSlateBlue",
+      "buttonPath": "ButtonClicks/NonClickv2.svg",
+      "textColor": "white"
+    },
+    {
+      "track": "📱 App Dev Track",
+      "team": "Team Pixel",
+      "runnerUp": "Team UIUX",
+      "secondRunnerUp": "Team FlutterForce",
+      "description": "Created a cross-platform mobile application with seamless UI/UX and performance optimization.",
+      "bgColor": "#3D6518",
+      "borderColor": "OliveDrab",
+      "buttonPath": "ButtonClicks/NonClickv3.svg",
+      "textColor": "white"
+    },
+    {
+      "track": "⚙️ Open Innovation",
+      "team": "Team Innovators",
+      "runnerUp": "Team Vision",
+      "secondRunnerUp": "Team Builders",
+      "description": "Delivered an innovative solution addressing real-world problems with scalable architecture.",
+      "bgColor": "#5F005F",
+      "borderColor": "DarkViolet",
+      "buttonPath": "ButtonClicks/NonClickv1.svg",
+      "textColor": "white"
+    }
+  ]
+}
