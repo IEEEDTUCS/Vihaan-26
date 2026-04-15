@@ -99,7 +99,7 @@ function Winner() {
               "claimHeart",
               "Contra resonance",
               "Oscillator",
-              "Aurelis",
+              "Aurelius",
               "Embedded Syndicate"
             ].map((team, index) => (
               <motion.div

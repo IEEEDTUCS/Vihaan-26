@@ -175,7 +175,7 @@ function CheckpointRow({ cp, token, onAlert, isLeader, teamType }) {
         {cp.submit_link && <a href={cp.submit_link} target="_blank" rel="noreferrer"
           style={{ fontFamily:"Edu TAS Beginner, sans-serif", fontSize:"0.8rem", color:"#9CA802", textDecoration:"underline" }}>View</a>}
       </div>
-      {isLeader && !alreadyDone && windowOpen && (
+      {isLeader && windowOpen && (
         <form onSubmit={handleSubmit} style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
           {isHardware ? (
             <input type="file" accept="image/*" onChange={e => setImageFile(e.target.files[0])}
