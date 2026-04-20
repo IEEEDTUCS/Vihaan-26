@@ -34,6 +34,7 @@ function App() {
             <Route element={<AdminProtectedRoute />}>
               <Route path="/adminDashboard" element={<SuperAdminDashboard />} />
             </Route>
+            <Route path="*" element={<Home />} />
           </Routes>
         </AuthProvider>
       </Router>
