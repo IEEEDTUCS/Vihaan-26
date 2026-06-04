@@ -41,9 +41,9 @@ While this project served as a robust backbone for Vihaan 9.0, we have identifie
 ---
 
 ## 🛠️ Tech Stack Snapshot
-- **Frontend:** JavaScript / TypeScript (React/Next.js)
-- **Backend:** Node.js
-- **Deployment:** Vercel
+- **Frontend:** JavaScript / TypeScript (React)
+- **Backend & DB:** Node.js, TypeSCript, MongoDB
+- **Deployment:** AWS
 
 ---
 *Built with ❤️ by the Vihaan 9.0 Tech Team at [IEEE DTU CS](https://github.com/IEEEDTUCS).*
@@ -51,3 +51,7 @@ While this project served as a robust backbone for Vihaan 9.0, we have identifie
 this project gave a lot of bugs thinking fear but memories too , a great initiative by IEEE DTU CS community, this will be always memorable to me ~~ Zahan Sharma 2k27 batch.
 Hoping things will go even beyond from this
 Best of luck.
+
+Rough Architecture:
+<img width="9920" height="4745" alt="Untitled-2026-06-04-2249" src="https://github.com/user-attachments/assets/7f605f0c-38f6-4be3-a343-fc3d2cf8e721" />
+
