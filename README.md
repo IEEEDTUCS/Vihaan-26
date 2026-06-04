@@ -53,5 +53,6 @@ Hoping things will go even beyond from this
 Best of luck.
 
 Rough Architecture:
+
 <img width="9920" height="4745" alt="Untitled-2026-06-04-2249" src="https://github.com/user-attachments/assets/7f605f0c-38f6-4be3-a343-fc3d2cf8e721" />
 
