@@ -31,7 +31,7 @@ self.addEventListener('push', event => {
       title: 'VIHAAN 9.0',
       message: rawDataText,
       icon: '/pwa-512x512.png',
-      url: 'https://vihaan.ieeedtu.in/' // ✅ updated default URL
+      url: 'https://9.vihaan.ieeedtu.in/' // ✅ updated default URL
     };
   }
 
@@ -42,7 +42,7 @@ self.addEventListener('push', event => {
     icon: data.icon || '/pwa-512x512.png',
     badge: '/logo.svg',
     data: {
-      url: data.url || 'https://vihaan.ieeedtu.in/' // ✅ updated default URL
+      url: data.url || 'https://9.vihaan.ieeedtu.in/' // ✅ updated default URL
     }
   };
 
@@ -57,7 +57,7 @@ self.addEventListener('notificationclick', event => {
   event.notification.close();
 
   const targetUrl =
-    event.notification.data?.url || 'https://vihaan.ieeedtu.in/';
+    event.notification.data?.url || 'https://9.vihaan.ieeedtu.in/';
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(
