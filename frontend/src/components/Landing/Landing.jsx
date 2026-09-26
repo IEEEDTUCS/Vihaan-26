@@ -275,8 +275,8 @@ export default function Landing({ showPrizes, setShowPrizes, glowTrigger, setGlo
             <div className="mb-4 text-lg reg tracking-wide">REGISTRATIONS CLOSED</div>
 
             <div className="flex gap-3">
-            <Button text="Login" link="https://vihaan.ieeedtu.in/login" type={false} />
-            <Button text="Winners" link="https://vihaan.ieeedtu.in/winners" type={false} />
+            <Button text="Login" link="https://9.vihaan.ieeedtu.in/login" type={false} />
+            <Button text="Winners" link="https://9.vihaan.ieeedtu.in/winners" type={false} />
             </div>
 
             {/* ── Timer: compact, below the Unstop button ── */}
